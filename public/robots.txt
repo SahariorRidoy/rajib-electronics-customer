@@ -1,0 +1,21 @@
+# *
+User-agent: *
+Allow: /
+
+# *
+User-agent: *
+Disallow: /login
+Disallow: /register
+Disallow: /forgot-password
+Disallow: /reset-password
+Disallow: /profile
+Disallow: /orders
+Disallow: /cart
+Disallow: /checkout
+Disallow: /invoices
+
+# Host
+Host: https://rajibelectronics.com
+
+# Sitemaps
+Sitemap: https://rajibelectronics.com/sitemap.xml
