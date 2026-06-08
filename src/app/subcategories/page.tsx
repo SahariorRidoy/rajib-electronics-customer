@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
+import Image from "@/lib/image";
 import { motion } from "framer-motion";
 import { Sparkles, ArrowRight, Grid3x3 } from "lucide-react";
 import { useSearchParams } from "next/navigation";

@@ -1,5 +1,5 @@
 // src/components/ManufacturerBanner.tsx
-import Image from "next/image";
+import Image from "@/lib/image";
 import React, { useState, useEffect } from "react";
 
 type Manufacturer = { _id?: string; name?: string } | string;

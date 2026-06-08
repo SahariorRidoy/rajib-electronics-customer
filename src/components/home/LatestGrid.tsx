@@ -1,6 +1,6 @@
 // src/components/home/LatestGrid.tsx
 import Link from "next/link";
-import Image from "next/image";
+import Image from "@/lib/image";
 import NewArrivalsMobile from "@/components/home/NewArrivalsMobile"; // ensure this path exists
 import { fetchProducts } from "@/services/catalog";
 import { ZProduct, type Product } from "@/lib/schemas";

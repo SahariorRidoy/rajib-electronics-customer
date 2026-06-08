@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { AppProduct } from "@/types/product";
-import Image from "next/image";
+import Image from "@/lib/image";
 
 export default function ProductCardCompact({ p }: { p: AppProduct }) {
   const discount =

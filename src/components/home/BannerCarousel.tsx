@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState, memo } from "react";
-import Image from "next/image";
+import Image from "@/lib/image";
 import Link from "next/link";
 import type { Banner } from "@/types/banner";
 import { ChevronRight } from "lucide-react";

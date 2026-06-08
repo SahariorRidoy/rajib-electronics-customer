@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useRef } from "react";
-import Image from "next/image";
+import Image from "@/lib/image";
 
 type Banner = {
   _id?: string;

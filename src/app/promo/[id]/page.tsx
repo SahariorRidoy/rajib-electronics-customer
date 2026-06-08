@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import Image from "next/image";
+import Image from "@/lib/image";
 import PromoHero from "@/components/PromoHero";
 import TrendingGrid from "@/components/home/TrendingGrid";
 import ManufacturerBannerSlider from "@/components/ManufacturerBannerSlider";

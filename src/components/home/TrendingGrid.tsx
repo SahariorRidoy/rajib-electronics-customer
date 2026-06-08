@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* src/components/TrendingGrid.tsx */
 "use client";
-import Image from "next/image";
+import Image from "@/lib/image";
 import Link from "next/link";
 import { useEffect, useMemo, useState, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";

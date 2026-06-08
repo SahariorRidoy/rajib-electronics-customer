@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Image from "next/image";
+import Image from "@/lib/image";
 import { CldImage } from "@/lib/cdn";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";

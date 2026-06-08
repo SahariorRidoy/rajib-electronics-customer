@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // src/components/home/DiscountedGrid.tsx
 import Link from "next/link";
-import Image from "next/image";
+import Image from "@/lib/image";
 import { fetchProducts } from "@/services/catalog";
 import { ZProduct, type Product } from "@/lib/schemas";
 

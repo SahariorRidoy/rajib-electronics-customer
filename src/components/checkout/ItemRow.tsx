@@ -2,7 +2,7 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import Image from "next/image";
+import Image from "@/lib/image";
 import { Plus, Minus, X } from "lucide-react";
 import { useCartStore } from "@/store/cartStore";
 

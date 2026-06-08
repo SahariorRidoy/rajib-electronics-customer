@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { notFound } from "next/navigation";
-import Image from "next/image";
+import Image from "@/lib/image";
 import Link from "next/link";
 import { fetchProduct, fetchProducts } from "@/services/catalog";
 import type { Product } from "@/types";

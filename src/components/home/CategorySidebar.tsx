@@ -2,7 +2,7 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
+import Image from "@/lib/image";
 import type { Category } from "@/lib/schemas";
 
 type Props = { categories: Category[]; loading?: boolean };

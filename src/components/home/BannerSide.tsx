@@ -1,7 +1,7 @@
 // src/components/home/BannerSide.tsx
 "use client";
 import { useEffect, useState } from "react";
-import Image from "next/image";
+import Image from "@/lib/image";
 import { cldFill } from "@/lib/cdn";
 
 type Banner = { _id: string; image: string; title?: string; subtitle?: string };

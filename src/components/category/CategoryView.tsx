@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // frontend/src/components/category/CategoryView.tsx
 import React from "react";
-import Image from "next/image";
+import Image from "@/lib/image";
 import Link from "next/link";
 import CategoryHeroSlider from "./CategoryHeroSlider";
 import CategoryProducts from "./CategoryProducts";

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // frontend/src/components/PromoHero.tsx
-import Image from "next/image";
+import Image from "@/lib/image";
 import React from "react";
 
 export default function PromoHero({

@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import Image from "next/image";
+import Image from "@/lib/image";
 import { memo } from "react";
 import { useGetSideBannersQuery } from "@/services/catalog.api";
 import type { Banner } from "@/types/banner";

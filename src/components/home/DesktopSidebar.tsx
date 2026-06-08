@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import Image from "next/image";
+import Image from "@/lib/image";
 import { Sparkles } from "lucide-react";
 import type { Category } from "@/lib/schemas";
 import { memo, useState, useEffect} from "react";

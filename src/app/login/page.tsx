@@ -10,7 +10,7 @@ import { clearGuestData } from "@/lib/localStorage";
 import { gtmLogin } from "@/lib/gtm";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import Image from "next/image";
+import Image from "@/lib/image";
 import { usePublicSettings } from "@/hooks/usePublicSettings";
 
 export default function LoginPage() {

@@ -5,7 +5,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import ProductCard from "@/components/ProductCard";
 import type { Product } from "@/types/product";
 import { fetchProducts } from "@/services/catalog";
-import Image from "next/image";
+import Image from "@/lib/image";
 import Link from "next/link";
 import { useCartStore } from "@/store/cartStore";
 import { toast } from "react-hot-toast";

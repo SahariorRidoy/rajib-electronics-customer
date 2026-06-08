@@ -1,7 +1,7 @@
 "use client";
 import { memo } from "react";
 import Link from "next/link";
-import Image from "next/image";
+import Image from "@/lib/image";
 import { Sparkles, ChevronRight, ShoppingBag } from "lucide-react";
 import type { Category } from "@/lib/schemas";
 

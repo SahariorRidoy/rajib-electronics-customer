@@ -2,7 +2,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import Image from "next/image";
+import Image from "@/lib/image";
 import { useGetProductByIdQuery } from "@/services/catalog.api";
 import { usePublicSettings } from "@/hooks/usePublicSettings";
 import { Package } from "lucide-react";

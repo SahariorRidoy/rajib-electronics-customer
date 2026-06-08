@@ -2,7 +2,7 @@
 "use client";
 
 import { Package } from "lucide-react";
-import Image from "next/image";
+import Image from "@/lib/image";
 import type { Order } from "@/types/order";
 
 const money = (n: number) => `৳${Number(n || 0).toFixed(2)}`;
