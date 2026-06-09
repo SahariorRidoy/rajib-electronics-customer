@@ -86,8 +86,9 @@ function TopbarInner() {
   );
 
   const { siteName: brand, activeLogo, socialLinks } = usePublicSettings();
-  const waLink = socialLinks.find((l) => l.platform.toLowerCase() === "whatsapp");
-  const msLink = socialLinks.find((l) => l.platform.toLowerCase() === "messenger");
+  const logoUrl = useMemo(() => activeLogo?.logoUrl || "/logo.png", [activeLogo]);
+  const waLink = useMemo(() => socialLinks.find((l) => l.platform.toLowerCase() === "whatsapp"), [socialLinks]);
+  const msLink = useMemo(() => socialLinks.find((l) => l.platform.toLowerCase() === "messenger"), [socialLinks]);
   const hotline = process.env.NEXT_PUBLIC_HOTLINE || "+88017100000000";
   const API_BASE =
     process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_BASE;
@@ -235,13 +236,13 @@ function TopbarInner() {
             >
               <div className="relative w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 rounded-xl overflow-hidden bg-white shadow-md flex items-center justify-center">
                 <Image
-                  src={activeLogo?.logoUrl || "/logo.png"}
+                  src={logoUrl}
                   alt={brand}
                   fill
                   sizes="(max-width:768px) 36px, 48px"
                   className="object-contain"
                   priority
-                  onError={(e) => { e.currentTarget.src = "/logo.png"; }}
+                  onError={(e) => { if (e.currentTarget.src !== "/logo.png") e.currentTarget.src = "/logo.png"; }}
                 />
               </div>
               <div className="flex flex-col text-sm sm:text-base lg:text-lg font-bold text-white tracking-wide leading-tight">
@@ -453,12 +454,12 @@ function TopbarInner() {
             >
               <div className="relative w-10 h-10 rounded-full overflow-hidden">
                 <Image
-                  src={activeLogo?.logoUrl || "/logo.png"}
+                  src={logoUrl}
                   alt={brand}
                   fill
                   sizes="40px"
                   className="object-contain"
-                  onError={(e) => { e.currentTarget.src = "/logo.png"; }}
+                  onError={(e) => { if (e.currentTarget.src !== "/logo.png") e.currentTarget.src = "/logo.png"; }}
                 />
               </div>
             </Link>

@@ -28,32 +28,44 @@ interface SiteSettings {
   contactInfo: ContactInfo;
 }
 
+// Stable derived values cached at module level — never recreated
 let cache: SiteSettings | null = null;
+let activeLogo: Logo | undefined = undefined;
+let socialLinks: SocialLink[] = [];
+let emails: string[] = [];
+let phones: string[] = [];
+let siteName: string = process.env.NEXT_PUBLIC_BRAND || "Rajib Electronics";
+let fetchPromise: Promise<void> | null = null;
+
+function applyCache(data: SiteSettings) {
+  cache = data;
+  siteName = data.siteName ?? (process.env.NEXT_PUBLIC_BRAND || "Rajib Electronics");
+  activeLogo = data.logos.find((l) => l.isActive);
+  socialLinks = data.socialLinks ?? [];
+  emails = data.contactInfo?.emails ?? [];
+  phones = data.contactInfo?.phones ?? [];
+}
 
 export function usePublicSettings() {
-  const [settings, setSettings] = useState<SiteSettings | null>(cache);
+  const [, forceUpdate] = useState(0);
 
   useEffect(() => {
     if (cache) return;
+    if (fetchPromise) {
+      fetchPromise.then(() => forceUpdate((n) => n + 1));
+      return;
+    }
     const API = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_BASE;
     if (!API) return;
-    let cancelled = false;
-    fetch(`${API}/settings`)
+    fetchPromise = fetch(`${API}/settings`)
       .then((r) => r.json())
       .then((res) => {
-        if (cancelled || !res.data) return;
-        cache = res.data;
-        setSettings(res.data);
+        if (!res.data) return;
+        applyCache(res.data);
+        forceUpdate((n) => n + 1);
       })
       .catch(() => {});
-    return () => { cancelled = true; };
   }, []);
-
-  const activeLogo = settings?.logos.find((l) => l.isActive);
-  const siteName = settings?.siteName ?? (process.env.NEXT_PUBLIC_BRAND || "Rajib Electronics");
-  const socialLinks = settings?.socialLinks ?? [];
-  const emails = settings?.contactInfo?.emails ?? [];
-  const phones = settings?.contactInfo?.phones ?? [];
 
   return { siteName, activeLogo, socialLinks, emails, phones };
 }

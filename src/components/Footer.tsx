@@ -41,6 +41,7 @@ export default function Footer() {
                   width={48}
                   height={48}
                   className="object-contain w-full h-full"
+                  onError={(e) => { if (!e.currentTarget.src.endsWith("/favicon.ico")) e.currentTarget.src = "/favicon.ico"; }}
                 />
               </div>
 
