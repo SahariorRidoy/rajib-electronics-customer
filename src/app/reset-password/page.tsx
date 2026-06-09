@@ -1,13 +1,13 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { Eye, EyeOff, Sparkles, Lock, CheckCircle } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { authApi } from "@/services/auth.api";
 import Link from "next/link";
 import { motion } from "framer-motion";
 
-export default function ResetPasswordPage() {
+function ResetPasswordPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
@@ -188,5 +188,13 @@ export default function ResetPasswordPage() {
         </motion.div>
       </div>
     </main>
+  );
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={null}>
+      <ResetPasswordPageInner />
+    </Suspense>
   );
 }

@@ -5,7 +5,7 @@ import Image from "@/lib/image";
 import { motion } from "framer-motion";
 import { Sparkles, ArrowRight, Grid3x3 } from "lucide-react";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 
 interface Subcategory {
   _id: string;
@@ -19,7 +19,7 @@ interface Subcategory {
   };
 }
 
-export default function SubcategoriesPage() {
+function SubcategoriesPageInner() {
   const searchParams = useSearchParams();
   const categoryId = searchParams.get("category");
   const [subcategories, setSubcategories] = useState<Subcategory[]>([]);
@@ -145,5 +145,13 @@ export default function SubcategoriesPage() {
         ))}
       </motion.div>
     </main>
+  );
+}
+
+export default function SubcategoriesPage() {
+  return (
+    <Suspense fallback={null}>
+      <SubcategoriesPageInner />
+    </Suspense>
   );
 }

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "@/lib/image";
 import {  useRouter, useSearchParams } from "next/navigation";
-import { useState, useEffect, useMemo, useRef, useCallback } from "react";
+import { useState, useEffect, useMemo, useRef, useCallback, Suspense } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCartStore } from "@/store/cartStore";
 import clsx from "clsx";
@@ -61,7 +61,7 @@ function MobileCartButton({ cartCount }: { cartCount: number }) {
   );
 }
 
-export default function Topbar() {
+function TopbarInner() {
   const router = useRouter();
   const sp = useSearchParams();
 
@@ -613,5 +613,13 @@ export default function Topbar() {
 
       <div className="h-[70px] lg:h-20" />
     </>
+  );
+}
+
+export default function Topbar() {
+  return (
+    <Suspense fallback={<div className="h-[120px] lg:h-20 bg-[#167389]" />}>
+      <TopbarInner />
+    </Suspense>
   );
 }

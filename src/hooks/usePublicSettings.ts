@@ -36,13 +36,17 @@ export function usePublicSettings() {
   useEffect(() => {
     if (cache) return;
     const API = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_BASE;
+    if (!API) return;
+    let cancelled = false;
     fetch(`${API}/settings`)
       .then((r) => r.json())
       .then((res) => {
+        if (cancelled || !res.data) return;
         cache = res.data;
         setSettings(res.data);
       })
       .catch(() => {});
+    return () => { cancelled = true; };
   }, []);
 
   const activeLogo = settings?.logos.find((l) => l.isActive);

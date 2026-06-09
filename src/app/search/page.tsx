@@ -4,7 +4,7 @@
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "@/lib/image";
-import { useMemo, useEffect, useState, useCallback, useRef } from "react";
+import { useMemo, useEffect, useState, useCallback, useRef, Suspense } from "react";
 import {
   useGetProductsPaginatedQuery,
   useLazyGetProductsPaginatedQuery,
@@ -38,7 +38,7 @@ function buildQueryArg(sp: URLSearchParams): ProductsQuery {
   return { discounted, featured, tag, sort, limit: 24, page: 1 };
 }
 
-export default function SearchPageRTK() {
+function SearchPageRTKInner() {
   const sp = useSearchParams();
   const queryArg = useMemo(() => buildQueryArg(sp), [sp]);
   const router = useRouter();
@@ -364,7 +364,7 @@ export default function SearchPageRTK() {
   );
 
   return (
-    <main className="py-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto mt-10">
+    <main className="py-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto mt-10" suppressHydrationWarning>
       <div className="mb-8 text-center">
         <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">
           Search
@@ -607,5 +607,13 @@ export default function SearchPageRTK() {
         </div>
       )}
     </main>
+  );
+}
+
+export default function SearchPageRTK() {
+  return (
+    <Suspense fallback={null}>
+      <SearchPageRTKInner />
+    </Suspense>
   );
 }
