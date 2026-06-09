@@ -81,7 +81,6 @@ export function useCustomerOrders(): UseCustomerOrdersResult {
       const url = `${API}/customer/orders?phone=${encodeURIComponent(currentPhone)}&page=${page}&limit=10`;
 
       const res = await fetch(url, {
-        credentials: "include",
         cache: "no-store",
         headers: { "Content-Type": "application/json" },
         signal: ac.signal,

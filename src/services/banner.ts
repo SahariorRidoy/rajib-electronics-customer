@@ -34,7 +34,7 @@ function authFetch(input: string, init: RequestInit = {}) {
     null;
   const headers = new Headers(init.headers || {});
   if (token) headers.set("Authorization", `Bearer ${token}`);
-  return fetch(input, { ...init, headers, credentials: "include" });
+  return fetch(input, { ...init, headers });
 }
 
 export async function createAdminBanner(body: CreateBannerDTO) {

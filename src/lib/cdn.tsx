@@ -19,9 +19,13 @@ export function cldFill(src: string, _w: number, _h: number) {
   return src;
 }
 
+const PLACEHOLDER =
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect width='100' height='100' fill='%23f3f4f6'/%3E%3C/svg%3E";
+
 /** Drop-in replacement for next/image — now simply renders next/image directly. */
 export function CldImage({ src, ...props }: ImageProps) {
-  const resolvedSrc = typeof src === "string" ? resolveImageSrc(src) : src;
+  const safeSrc = src && (typeof src !== "string" || src.trim() !== "") ? src : PLACEHOLDER;
+  const resolvedSrc = typeof safeSrc === "string" ? resolveImageSrc(safeSrc) : safeSrc;
   // eslint-disable-next-line jsx-a11y/alt-text
   return <Image src={resolvedSrc} {...props} />;
 }

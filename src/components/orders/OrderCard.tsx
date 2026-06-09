@@ -96,7 +96,6 @@ export default function OrderCard({ order, onViewInvoice }: OrderCardProps) {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/orders`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        credentials: "include",
         body: JSON.stringify(payload),
       });
 

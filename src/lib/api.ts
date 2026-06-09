@@ -1,10 +1,7 @@
 
 
 
- export const API = process.env.NEXT_PUBLIC_API_BASE_URL;
-if (!API) {
-  throw new Error("Missing NEXT_PUBLIC_API_BASE_URL environment variable");
-}
+export const API = process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://api.rajibelectronics.com/api/v1";
 
 export default async function apiGet<T>(path: string, init?: RequestInit): Promise<T> {
   const url = `${API}${path}`;

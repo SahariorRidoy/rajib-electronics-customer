@@ -40,8 +40,11 @@ export default function CheckoutPage() {
   
   const total = subtotal + deliveryCharge;
 
+  const [mounted, setMounted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showMobileSummary, setShowMobileSummary] = useState(false);
+
+  useEffect(() => setMounted(true), []);
 
   // Fire InitiateCheckout once when page mounts with items
   const hasItems = items.length > 0;
@@ -167,6 +170,9 @@ export default function CheckoutPage() {
       setIsSubmitting(false);
     }
   };
+
+  // 🛒 Not yet mounted (SSR) — render nothing to avoid hydration mismatch
+  if (!mounted) return null;
 
   // 🛒 Empty cart view
   if (items.length === 0) {

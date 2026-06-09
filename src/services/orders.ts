@@ -8,8 +8,7 @@ import type {
 } from "@/types/order";
 import { isUserAuthenticated, STORAGE_KEYS } from "@/lib/localStorage";
 
-const API = process.env.NEXT_PUBLIC_API_BASE_URL!;
-if (!API) throw new Error("NEXT_PUBLIC_API_BASE_URL is missing");
+const API = process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://api.rajibelectronics.com/api/v1";
 
 
 
@@ -61,7 +60,6 @@ export async function createOrder(
     const res = await fetch(`${API}/orders`, {
       method: "POST",
       headers,
-      credentials: "include",
       body: JSON.stringify(payload),
       cache: "no-store",
       signal: options?.signal,
