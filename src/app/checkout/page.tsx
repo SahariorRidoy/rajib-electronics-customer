@@ -13,10 +13,10 @@ import CustomerInfoForm from "@/components/checkout/CustomerInfoForm";
 import OrderSummaryCard from "@/components/checkout/OrderSummaryCard";
 import { useDeliveryCharge } from "@/hooks/useDeliveryCharge";
 import { useCustomerInfo } from "@/hooks/useCustomerInfo";
+import { usePublicSettings } from "@/hooks/usePublicSettings";
 import { pixelInitiateCheckout, pixelPurchase } from "@/lib/pixel";
 import { gtmBeginCheckout, gtmPurchase } from "@/lib/gtm";
 
-const HOTLINE = process.env.NEXT_PUBLIC_HOTLINE || "+8801318319610";
 
 // helper
 const toNum = (v: unknown, f = 0) =>
@@ -27,10 +27,12 @@ export default function CheckoutPage() {
   const router = useRouter();
   const items = useCartStore((s) => s.items);
   const clearCart = useCartStore((s) => s.clearCart);
-  const getTotalPrice = useCartStore((s) => s.getTotalPrice);
+  const subtotal = useCartStore((s) =>
+    s.items.reduce((acc, it) => acc + Number(it.price || 0) * (it.quantity || 0), 0)
+  );
   const { customerInfo, isGuest, isLoggedIn, user } = useCustomerInfo();
-
-  const subtotal = getTotalPrice ? getTotalPrice() : 0;
+  const { phones } = usePublicSettings();
+  const hotline = phones[0] || process.env.NEXT_PUBLIC_HOTLINE || "09611677379";
   
   // Fetch delivery charge dynamically
   const { deliveryInfo, loading: deliveryLoading } = useDeliveryCharge(subtotal);
@@ -168,8 +170,17 @@ export default function CheckoutPage() {
     }
   };
 
-  // 🛒 Not yet mounted (SSR) — render nothing to avoid hydration mismatch
-  if (!mounted) return null;
+  if (!mounted) return (
+    <div className="min-h-screen bg-gray-50 py-8 px-4">
+      <div className="max-w-6xl mx-auto pt-10 animate-pulse">
+        <div className="h-10 w-48 bg-gray-200 rounded mx-auto mb-8" />
+        <div className="grid md:grid-cols-5 gap-6">
+          <div className="md:col-span-3 bg-white rounded-2xl h-96 shadow" />
+          <div className="md:col-span-2 bg-white rounded-2xl h-64 shadow hidden md:block" />
+        </div>
+      </div>
+    </div>
+  );
 
   // 🛒 Empty cart view
   if (items.length === 0) {
@@ -294,10 +305,10 @@ export default function CheckoutPage() {
               <div className="text-center pt-6 border-t border-pink-100">
                 <p className="text-gray-600 mb-3 text-sm">Or</p>
                 <a
-                  href={`tel:${HOTLINE}`}
+                  href={`tel:${hotline}`}
                   className="inline-flex items-center gap-2 text-[#167389] hover:text-pink-700 font-semibold text-sm sm:text-base"
                 >
-                  📞 Call to order: {HOTLINE}
+                  📞 Call to order: {hotline}
                 </a>
               </div>
             </div>

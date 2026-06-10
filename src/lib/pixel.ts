@@ -17,7 +17,9 @@ export function pixelEvent(
   eventId?: string
 ): void {
   if (typeof window === "undefined" || !window.fbq) return;
-  console.log(`[Meta Pixel] ${event}`, params ?? "");
+  if (process.env.NODE_ENV === "development") {
+    console.log(`[Meta Pixel] ${event}`, params ?? "");
+  }
   if (eventId) {
     window.fbq("track", event, params ?? {}, { eventID: eventId });
   } else if (params) {

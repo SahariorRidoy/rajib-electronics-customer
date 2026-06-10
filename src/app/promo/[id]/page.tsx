@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { use } from "react";
 import Image from "@/lib/image";
 import PromoHero from "@/components/PromoHero";
 import TrendingGrid from "@/components/home/TrendingGrid";
@@ -9,8 +9,8 @@ import ProductCard from "@/components/ProductCard";
 import type { AppProduct } from "@/types/product";
 import { useGetPromoProductsQuery } from "@/store/promocardApi";
 
-export default function PromoPage({ params }: { params: { id: string } }) {
-  const { id } = params;
+export default function PromoPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
   const { data, isLoading, isError, isSuccess } = useGetPromoProductsQuery({
     id,
   });

@@ -20,7 +20,7 @@ export default function HeroBannerClient({
     return (
       <div
         className={`w-full rounded-md bg-gray-200 animate-pulse ${
-          heightClass ?? "h-[160px] sm:h-[280px] lg:h-full"
+          heightClass ?? "h-40 sm:h-[280px] lg:h-full"
         }`}
       />
     );

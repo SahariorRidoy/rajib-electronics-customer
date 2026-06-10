@@ -1,7 +1,8 @@
 
 import CategoryView from "@/components/category/CategoryView";
 
-export default function CategoryPage({ params }: { params: { slug: string } }) {
-  const slug = decodeURIComponent(params.slug);
+export default async function CategoryPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug: rawSlug } = await params;
+  const slug = decodeURIComponent(rawSlug);
   return <CategoryView slug={slug} />;
 }

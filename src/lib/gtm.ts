@@ -11,7 +11,9 @@ function push(event: string, data?: Record<string, unknown>) {
   if (typeof window === "undefined") return;
   window.dataLayer = window.dataLayer || [];
   window.dataLayer.push({ event, ...data });
-  console.log("[GTM]", event, data ?? "");
+  if (process.env.NODE_ENV === "development") {
+    console.log("[GTM]", event, data ?? "");
+  }
 }
 
 // ─── Page ─────────────────────────────────────────────────────────────────────

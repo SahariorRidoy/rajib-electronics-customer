@@ -14,7 +14,9 @@ function PixelPageView() {
     // Meta Pixel
     if (window.fbq) {
       window.fbq("track", "PageView");
-      console.log("[Meta Pixel] PageView", url);
+      if (process.env.NODE_ENV === "development") {
+        console.log("[Meta Pixel] PageView", url);
+      }
     }
 
     // GTM
