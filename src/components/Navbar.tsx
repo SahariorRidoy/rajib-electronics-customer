@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Search, ShoppingCart, Phone, Menu, X, Sparkles, User, LogOut } from "lucide-react";
 import { useCartStore } from "@/store/cartStore";
 import { useAuth } from "@/hooks/useAuth";
+import { usePublicSettings } from "@/hooks/usePublicSettings";
 
 interface Category {
   _id: string;
@@ -21,6 +22,8 @@ export default function Navbar() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const { phones } = usePublicSettings();
+  const phone = phones[0] || "";
 
   // Zustand cart store
   const cartItems = useCartStore((state) => state.items);
@@ -143,16 +146,18 @@ export default function Navbar() {
             {/* Right Icons */}
             <div className="flex items-center gap-1.5 sm:gap-3">
               {/* Call Button - Desktop */}
+              {phone && (
               <a
-                href="tel:01700000000"
+                href={`tel:${phone}`}
                 className="hidden lg:flex items-center gap-2 bg-pink-100 px-3.5 py-2 rounded-full hover:bg-pink-200 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-500"
                 title="Call Us"
               >
                 <Phone size={18} className="text-pink-600" aria-hidden="true" />
                 <span className="text-sm font-medium text-pink-700">
-                  Call Us
+                  {phone}
                 </span>
               </a>
+              )}
 
               {/* Auth/Profile Button */}
               <AuthButton />
@@ -288,15 +293,17 @@ export default function Navbar() {
                   {category.title}
                 </Link>
               ))}
+              {phone && (
               <a
-                href="tel:01700000000"
+                href={`tel:${phone}`}
                 className="flex items-center gap-2 px-4 py-3 bg-pink-50 rounded-xl font-medium text-pink-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-500"
                 role="menuitem"
                 title="Call Us"
               >
                 <Phone size={18} aria-hidden="true" />
-                <span>Call Us: 01700000000</span>
+                <span>Call Us: {phone}</span>
               </a>
+              )}
               <MobileAuthSection onClose={() => setMobileMenuOpen(false)} />
             </div>
           </motion.div>

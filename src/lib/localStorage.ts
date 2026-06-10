@@ -8,10 +8,7 @@ export interface CustomerInfo {
   name?: string;
   phone?: string;
   email?: string;
-  houseOrVillage?: string;
-  roadOrPostOffice?: string;
-  blockOrThana?: string;
-  district?: string;
+  address?: string;
 }
 
 // Keys used for customer data in localStorage

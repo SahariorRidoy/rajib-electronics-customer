@@ -45,9 +45,6 @@ export default function CustomerInfoForm({
         {errors.name && <p className="error">{errors.name.message}</p>}
       </div>
 
-      {/* Email */}
-    
-
       {/* Phone */}
       <div>
         <label className="block text-sm font-semibold text-gray-700 mb-1">
@@ -61,62 +58,20 @@ export default function CustomerInfoForm({
         {errors.phone && <p className="error">{errors.phone.message}</p>}
       </div>
 
-      {/* House / Village */}
-      <div>
+      {/* Address */}
+      <div className="col-span-full">
         <label className="block text-sm font-semibold text-gray-700 mb-1">
-          House / Village
+          Address
         </label>
-        <input
-          {...register("houseOrVillage")}
-          placeholder="e.g. Shantinagar"
-          className="input"
+        <textarea
+          {...register("address")}
+          placeholder="Enter your full address (house, road, area, district)"
+          rows={3}
+          className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#167389] focus:border-[#167389] text-gray-800 resize-none"
         />
-        {errors.houseOrVillage && (
-          <p className="error">{errors.houseOrVillage.message}</p>
+        {errors.address && (
+          <p className="error">{errors.address.message}</p>
         )}
-      </div>
-
-      {/* Road / Post Office */}
-      <div>
-        <label className="block text-sm font-semibold text-gray-700 mb-1">
-          Road / Post Office
-        </label>
-        <input
-          {...register("roadOrPostOffice")}
-          placeholder="e.g. Road 12 / Banani Post Office"
-          className="input"
-        />
-        {errors.roadOrPostOffice && (
-          <p className="error">{errors.roadOrPostOffice.message}</p>
-        )}
-      </div>
-
-      {/* Block / Thana */}
-      <div>
-        <label className="block text-sm font-semibold text-gray-700 mb-1">
-          Block / Thana
-        </label>
-        <input
-          {...register("blockOrThana")}
-          placeholder="e.g. Gulshan / Kotwali"
-          className="input"
-        />
-        {errors.blockOrThana && (
-          <p className="error">{errors.blockOrThana.message}</p>
-        )}
-      </div>
-
-      {/* District */}
-      <div>
-        <label className="block text-sm font-semibold text-gray-700 mb-1">
-          District
-        </label>
-        <input
-          {...register("district")}
-          placeholder="e.g. Dhaka"
-          className="input"
-        />
-        {errors.district && <p className="error">{errors.district.message}</p>}
       </div>
 
       <div className="col-span-full flex justify-end mt-4">
@@ -131,8 +86,3 @@ export default function CustomerInfoForm({
     </form>
   );
 }
-
-/* Tailwind utilities for better readability */
-const inputClass =
-  "w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#167389] focus:border-[#167389] text-gray-800";
-const errorClass = "text-sm text-rose-600 mt-1 font-medium";

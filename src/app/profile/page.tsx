@@ -21,10 +21,6 @@ import type { Order } from "@/types/order";
 type CustomerLocal = {
   name?: string;
   phone?: string;
-  houseOrVillage?: string;
-  roadOrPostOffice?: string;
-  blockOrThana?: string;
-  district?: string;
   address?: string;
 };
 
@@ -96,16 +92,7 @@ export default function ProfilePage() {
 
   const fullAddress = useMemo(() => {
     if (!customer) return "";
-    if (customer.address) return customer.address;
-    const parts = [
-      customer.houseOrVillage,
-      customer.roadOrPostOffice,
-      customer.blockOrThana,
-      customer.district,
-    ]
-      .map((x) => x?.trim())
-      .filter(Boolean);
-    return parts.join(", ");
+    return customer.address || "";
   }, [customer]);
 
   const loadOrders = async (ph: string) => {
@@ -290,16 +277,7 @@ export default function ProfilePage() {
                 <div>
                   <p className="text-gray-500">Address</p>
                   <p className="font-semibold text-gray-900 break-words">
-                    {profileData?.address
-                      ? [
-                          profileData.address.houseOrVillage,
-                          profileData.address.roadOrPostOffice,
-                          profileData.address.blockOrThana,
-                          profileData.address.district,
-                        ]
-                          .filter(Boolean)
-                          .join(", ")
-                      : user?.address || "—"}
+                    {profileData?.address || user?.address || "—"}
                   </p>
                 </div>
               </div>

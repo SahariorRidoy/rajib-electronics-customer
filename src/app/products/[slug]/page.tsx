@@ -70,13 +70,25 @@ function RelatedCard({ product }: { product: Product | any }) {
   );
 }
 
+async function fetchHotline(): Promise<string> {
+  try {
+    const API = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_BASE;
+    if (!API) return "";
+    const res = await fetch(`${API}/settings`, { cache: "no-store" });
+    const json = await res.json();
+    return json?.data?.contactInfo?.phones?.[0] || "";
+  } catch {
+    return "";
+  }
+}
+
 export default async function ProductDetailsPage({
   params,
 }: {
   params: Promise<{ slug: string }>;
 }) {
-  const hotline = process.env.NEXT_PUBLIC_HOTLINE || "+8801318319610";
   const { slug } = await params;
+  const hotline = await fetchHotline();
 
   const res = await fetchProduct(slug).catch(() => null);
   if (!res?.data) return notFound();

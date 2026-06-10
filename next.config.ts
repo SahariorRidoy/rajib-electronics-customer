@@ -14,9 +14,35 @@ const nextConfig = {
       },
     ];
   },
+  async headers() {
+    return [
+      {
+        // Long-term cache for static public assets
+        source: "/:path*.(png|jpg|jpeg|webp|svg|ico|gif|avif)",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
+      {
+        // Next.js optimized images — 1 day
+        source: "/_next/image(.*)",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=86400, stale-while-revalidate=604800",
+          },
+        ],
+      },
+    ];
+  },
   images: {
-    unoptimized: true, // disables Vercel image optimization entirely — no 5k limit
+    // Optimization enabled — Next.js compresses images with sharp on the VPS
+    // (removes the ~3.6 MB raw logo problem; serves WebP/AVIF at correct size)
     dangerouslyAllowSVG: true,
+    minimumCacheTTL: 86400, // cache optimized images for 1 day
     remotePatterns: [
       { protocol: "https", hostname: "**" },
       { protocol: "http", hostname: "**" },

@@ -1,15 +1,8 @@
 // src/lib/cdn.tsx
 import Image, { ImageProps } from "next/image";
 
-/** Rewrites production image URLs to localhost in development */
+/** No-op — kept for backwards compatibility */
 export function resolveImageSrc(src: string): string {
-  if (!src) return src;
-  if (process.env.NODE_ENV === "development") {
-    return src.replace(
-      /https:\/\/api\.rajibelectronics\.com/g,
-      "http://localhost:5000"
-    );
-  }
   return src;
 }
 

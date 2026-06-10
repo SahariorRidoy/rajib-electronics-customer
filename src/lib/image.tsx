@@ -3,12 +3,7 @@ import NextImage, { ImageProps } from "next/image";
 /** Rewrites production image URLs to localhost in development */
 export function resolveImageSrc(src: string): string {
   if (!src) return src;
-  if (process.env.NODE_ENV === "development") {
-    return src.replace(
-      /https:\/\/api\.rajibelectronics\.com/g,
-      "http://localhost:5000"
-    );
-  }
+  // In dev, keep the production URL — localhost backend may not have the files
   return src;
 }
 

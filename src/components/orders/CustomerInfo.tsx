@@ -11,7 +11,7 @@ export default function CustomerInfo({ order }: { order: Order }) {
       <div className="text-sm text-gray-700 space-y-1">
         <p><span className="font-medium">Name:</span> {info.name}</p>
         <p><span className="font-medium">Phone:</span> {info.phone}</p>
-        <p><span className="font-medium">Address:</span> {info.houseOrVillage}, {info.roadOrPostOffice}, {info.blockOrThana}, {info.district}</p>
+        <p><span className="font-medium">Address:</span> {info.address || "N/A"}</p>
       </div>
     </div>
   );

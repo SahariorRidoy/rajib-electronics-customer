@@ -13,10 +13,7 @@ export interface CreateOrderDTO {
   customer: {
     name: string;
     phone: string;
-    houseOrVillage?: string;
-    roadOrPostOffice?: string;
-    blockOrThana?: string;
-    district?: string;
+    address?: string;
   };
   totals?: {
     subTotal: number;
@@ -90,11 +87,7 @@ export interface OrderCustomer {
   name: string;
   phone: string;
   email?: string;
-  houseOrVillage?: string;
-  roadOrPostOffice?: string;
-  blockOrThana?: string;
-  district?: string;
-  billingAddress?: string;
+  address?: string;
 }
 
 export interface Order {

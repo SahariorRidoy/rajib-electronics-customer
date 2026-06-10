@@ -40,26 +40,34 @@ function BannerCarouselBase({
     return () => clearInterval(t);
   }, [sources.length, autoMs]);
 
+  const nextIndex = (index + 1) % sources.length;
+
   return (
     <div
       className={`relative w-full rounded-md overflow-hidden border border-red-200 bg-white shadow-sm ${heightClass}`}
     >
       <div className="relative w-full h-full flex items-center justify-center bg-gray-50">
-        {sources.map((src, i) => (
-          <Image
-            key={i}
-            src={src}
-            alt={`Banner ${i + 1}`}
-            fill
-            className="object-contain"
-            style={{ 
-              transition: 'all 0.7s ease-in-out',
-              transform: i === index ? 'translateX(0)' : 'translateX(-100%)',
-              opacity: i === index ? 1 : 0
-            }}
-            priority={i === 0}
-          />
-        ))}
+        {sources.map((src, i) => {
+          const isActive = i === index;
+          const isNext = i === nextIndex;
+          // Only mount active and next slide — others stay unmounted to avoid bulk fetching
+          if (!isActive && !isNext) return null;
+          return (
+            <Image
+              key={i}
+              src={src}
+              alt={`Banner ${i + 1}`}
+              fill
+              className="object-contain"
+              style={{
+                transition: 'opacity 0.7s ease-in-out',
+                opacity: isActive ? 1 : 0,
+                zIndex: isActive ? 1 : 0,
+              }}
+              priority={i === 0}
+            />
+          );
+        })}
       </div>
 
       {/* CTA */}

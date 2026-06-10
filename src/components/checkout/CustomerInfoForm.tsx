@@ -1,13 +1,11 @@
 "use client";
 
 import { useForm } from "react-hook-form";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { motion } from "framer-motion";
-import { AlertCircle } from "lucide-react";
-import toast from "react-hot-toast";
-import { CheckCircle2 } from "lucide-react";
+import { AlertCircle, CheckCircle2 } from "lucide-react";
 
 //  Validation Schema (aligned with backend DTO)
 const CustomerSchema = z.object({
@@ -23,10 +21,7 @@ const CustomerSchema = z.object({
     .refine((val) => /^01[0-9]{9}$/.test(val), {
       message: "Enter a valid Bangladeshi number (01XXXXXXXXX)"
     }),
-  houseOrVillage: z.string().min(2, "Please enter your house/village"),
-  roadOrPostOffice: z.string().min(2, "Please enter your road/post office"),
-  blockOrThana: z.string().min(2, "Please enter your block/thana"),
-  district: z.string().min(2, "Please enter your district name"),
+  address: z.string().min(5, "Please enter your full address"),
 });
 
 export type CustomerFormData = z.infer<typeof CustomerSchema>;
@@ -41,27 +36,28 @@ export default function CustomerInfoForm({ onSubmit, isSubmitting, initialData }
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isDirty },
     reset,
   } = useForm<CustomerFormData>({
     resolver: zodResolver(CustomerSchema),
     defaultValues: initialData || {},
   });
 
+  const hasAppliedInitialData = useRef(false);
 
-
-  // Reset form when initialData changes
+  // Pre-fill form with initial data only once, and only if user hasn't started typing
   useEffect(() => {
-    if (initialData) {
+    if (!initialData) return;
+    const hasContent = !!(initialData.name || initialData.phone || initialData.address);
+    if (hasContent && !isDirty && !hasAppliedInitialData.current) {
       reset(initialData);
+      hasAppliedInitialData.current = true;
     }
-  }, [initialData, reset]);
+  }, [initialData, isDirty, reset]);
 
   const handleFormSubmit = async (data: CustomerFormData) => {
-      try {
+    try {
       await onSubmit(data);
-      toast.success("Order submitted successfully!");
-      reset();
     } catch (e) {
       console.error(e);
     }
@@ -128,83 +124,23 @@ export default function CustomerInfoForm({ onSubmit, isSubmitting, initialData }
         )}
       </div>
 
-      {/* Address Fields Group */}
-      <div className="grid sm:grid-cols-2 gap-4">
-        {/* House/Village */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            House / Village <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            {...register("houseOrVillage")}
-            placeholder="e.g. Uttara, Mirpur"
-            className={inputClass(!!errors.houseOrVillage)}
-          />
-          {errors.houseOrVillage && (
-            <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
-              <AlertCircle className="w-4 h-4" />
-              {errors.houseOrVillage.message}
-            </p>
-          )}
-        </div>
-
-        {/* Road / Post Office */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Road / Post Office <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            {...register("roadOrPostOffice")}
-            placeholder="e.g. Road 12, Banani Post"
-            className={inputClass(!!errors.roadOrPostOffice)}
-          />
-          {errors.roadOrPostOffice && (
-            <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
-              <AlertCircle className="w-4 h-4" />
-              {errors.roadOrPostOffice.message}
-            </p>
-          )}
-        </div>
-
-        {/* Block / Thana */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Block / Thana <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            {...register("blockOrThana")}
-            placeholder="e.g. Block C, Dhanmondi"
-            className={inputClass(!!errors.blockOrThana)}
-          />
-          {errors.blockOrThana && (
-            <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
-              <AlertCircle className="w-4 h-4" />
-              {errors.blockOrThana.message}
-            </p>
-          )}
-        </div>
-
-        {/* District */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            District <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            {...register("district")}
-            placeholder="e.g. Dhaka, Chattogram"
-            className={inputClass(!!errors.district)}
-          />
-          {errors.district && (
-            <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
-              <AlertCircle className="w-4 h-4" />
-              {errors.district.message}
-            </p>
-          )}
-        </div>
+      {/* Address */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Address <span className="text-red-500">*</span>
+        </label>
+        <textarea
+          {...register("address")}
+          placeholder="Enter your full address (house, road, area, district)"
+          rows={3}
+          className={`${inputClass(!!errors.address)} resize-none`}
+        />
+        {errors.address && (
+          <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+            <AlertCircle className="w-4 h-4" />
+            {errors.address.message}
+          </p>
+        )}
       </div>
 
       {/* Submit Button */}

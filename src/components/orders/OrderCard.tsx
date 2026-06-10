@@ -80,11 +80,7 @@ export default function OrderCard({ order, onViewInvoice }: OrderCardProps) {
         customer: {
           name: order.customer.name,
           phone: order.customer.phone,
-          houseOrVillage: order.customer.houseOrVillage,
-          roadOrPostOffice: order.customer.roadOrPostOffice,
-          blockOrThana: order.customer.blockOrThana,
-          district: order.customer.district,
-          billingAddress: order.customer.billingAddress,
+          address: order.customer.address,
         },
         totals: {
           subTotal: order.totals.subTotal,

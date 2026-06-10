@@ -10,12 +10,7 @@ import Link from "next/link";
 type ProfileData = {
   name: string;
   phone: string;
-  address: {
-    houseOrVillage: string;
-    roadOrPostOffice: string;
-    blockOrThana: string;
-    district: string;
-  };
+  address: string;
 };
 
 export default function EditProfilePage() {
@@ -26,12 +21,7 @@ export default function EditProfilePage() {
   const [profile, setProfile] = useState<ProfileData>({
     name: "",
     phone: "",
-    address: {
-      houseOrVillage: "",
-      roadOrPostOffice: "",
-      blockOrThana: "",
-      district: "",
-    },
+    address: "",
   });
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -61,17 +51,12 @@ export default function EditProfilePage() {
         },
       });
       const result = await response.json();
-      
+
       if (result.ok && result.data) {
         setProfile({
           name: result.data.name || "",
           phone: result.data.phone || "",
-          address: {
-            houseOrVillage: result.data.address?.houseOrVillage || "",
-            roadOrPostOffice: result.data.address?.roadOrPostOffice || "",
-            blockOrThana: result.data.address?.blockOrThana || "",
-            district: result.data.address?.district || "",
-          },
+          address: result.data.address || "",
         });
       } else {
         setError(result.code || "Failed to load profile");
@@ -204,60 +189,13 @@ export default function EditProfilePage() {
                 <MapPin className="w-4 h-4 text-[#167389]" />
                 <h3 className="text-sm font-semibold text-gray-900">Address</h3>
               </div>
-
-              <div className="space-y-3">
-                <input
-                  type="text"
-                  placeholder="House/Village"
-                  value={profile.address.houseOrVillage}
-                  onChange={(e) =>
-                    setProfile({
-                      ...profile,
-                      address: { ...profile.address, houseOrVillage: e.target.value },
-                    })
-                  }
-                  className="w-full px-3 py-2 rounded-lg border-2 border-gray-200 focus:border-[#167389] focus:ring-4 focus:ring-cyan-200/40 text-sm text-gray-900 placeholder:text-gray-400"
-                />
-
-                <input
-                  type="text"
-                  placeholder="Road/Post Office"
-                  value={profile.address.roadOrPostOffice}
-                  onChange={(e) =>
-                    setProfile({
-                      ...profile,
-                      address: { ...profile.address, roadOrPostOffice: e.target.value },
-                    })
-                  }
-                  className="w-full px-3 py-2 rounded-lg border-2 border-gray-200 focus:border-[#167389] focus:ring-4 focus:ring-cyan-200/40 text-sm text-gray-900 placeholder:text-gray-400"
-                />
-
-                <input
-                  type="text"
-                  placeholder="Block/Thana"
-                  value={profile.address.blockOrThana}
-                  onChange={(e) =>
-                    setProfile({
-                      ...profile,
-                      address: { ...profile.address, blockOrThana: e.target.value },
-                    })
-                  }
-                  className="w-full px-3 py-2 rounded-lg border-2 border-gray-200 focus:border-[#167389] focus:ring-4 focus:ring-cyan-200/40 text-sm text-gray-900 placeholder:text-gray-400"
-                />
-
-                <input
-                  type="text"
-                  placeholder="District"
-                  value={profile.address.district}
-                  onChange={(e) =>
-                    setProfile({
-                      ...profile,
-                      address: { ...profile.address, district: e.target.value },
-                    })
-                  }
-                  className="w-full px-3 py-2 rounded-lg border-2 border-gray-200 focus:border-[#167389] focus:ring-4 focus:ring-cyan-200/40 text-sm text-gray-900 placeholder:text-gray-400"
-                />
-              </div>
+              <textarea
+                placeholder="Enter your full address (house, road, area, district)"
+                value={profile.address}
+                onChange={(e) => setProfile({ ...profile, address: e.target.value })}
+                rows={3}
+                className="w-full px-3 py-2 rounded-lg border-2 border-gray-200 focus:border-[#167389] focus:ring-4 focus:ring-cyan-200/40 text-sm text-gray-900 placeholder:text-gray-400 resize-none"
+              />
             </div>
 
             <div className="flex gap-3 pt-4">

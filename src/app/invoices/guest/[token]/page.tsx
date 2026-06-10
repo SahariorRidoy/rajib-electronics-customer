@@ -114,7 +114,7 @@ export default function GuestInvoicePage() {
             <div className="bg-gray-50 border border-gray-200 rounded p-2 text-xs">
               <p className="text-black mb-0.5"><span className="font-semibold">Name:</span> {order.customer?.name}</p>
               <p className="text-black mb-0.5"><span className="font-semibold">Phone:</span> {order.customer?.phone}</p>
-              <p className="text-black"><span className="font-semibold">Address:</span> {order.customer?.houseOrVillage}, {order.customer?.roadOrPostOffice}, {order.customer?.blockOrThana}, {order.customer?.district}</p>
+              <p className="text-black"><span className="font-semibold">Address:</span> {order.customer?.address || "N/A"}</p>
             </div>
           </div>
 

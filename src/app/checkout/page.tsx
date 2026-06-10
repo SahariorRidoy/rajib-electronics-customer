@@ -80,10 +80,7 @@ export default function CheckoutPage() {
     const customer: any = {
       name: customerData.name,
       phone: customerData.phone,
-      houseOrVillage: customerData.houseOrVillage,
-      roadOrPostOffice: customerData.roadOrPostOffice,
-      blockOrThana: customerData.blockOrThana,
-      district: customerData.district,
+      address: customerData.address,
     };
 
 
