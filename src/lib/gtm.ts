@@ -12,7 +12,7 @@ function push(event: string, data?: Record<string, unknown>) {
   window.dataLayer = window.dataLayer || [];
   window.dataLayer.push({ event, ...data });
   if (process.env.NODE_ENV === "development") {
-    console.log("[GTM]", event, data ?? "");
+    console.log("[GTM]", String(event).replace(/[\r\n]/g, ""), JSON.stringify(data ?? ""));
   }
 }
 
