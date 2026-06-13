@@ -7,7 +7,6 @@ import { useDispatch } from "react-redux";
 import { setAuth } from "@/store/authSlice";
 import { authApi } from "@/services/auth.api";
 import { clearGuestData } from "@/lib/localStorage";
-import { gtmLogin } from "@/lib/gtm";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import Image from "@/lib/image";
@@ -52,7 +51,6 @@ export default function LoginPage() {
         }),
       );
 
-      gtmLogin();
       router.push("/profile");
     } catch (err: unknown) {
       console.error("Login failed:", err);

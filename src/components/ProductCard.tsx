@@ -11,7 +11,6 @@ import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import type { AppProduct } from "@/types/product";
 import { useCartStore } from "@/store/cartStore";
-import { pixelAddToCart } from "@/lib/pixel";
 
 type Props = {
   product: AppProduct | any;
@@ -142,14 +141,6 @@ export default function ProductCard({
           color: "Default",
         });
       }
-
-      pixelAddToCart({
-        content_ids: [String(product._id)],
-        content_name: title,
-        contents: [{ id: String(product._id), quantity, item_price: price, title }],
-        value: price * quantity,
-        quantity,
-      });
 
       toast.success(`${quantity} × ${title} added to cart`);
 

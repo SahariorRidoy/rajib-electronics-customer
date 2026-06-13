@@ -6,7 +6,6 @@ import { ShoppingCart, Zap, Phone, Sparkles, Plus, Minus } from "lucide-react";
 import { useCartStore } from "@/store/cartStore";
 import type { Product, ColorVariant } from "@/types";
 import { toast } from "react-hot-toast";
-import { pixelAddToCart } from "@/lib/pixel";
 import { gtmAddToCart } from "@/lib/gtm";
 import { ShoppingBag } from "lucide-react";
 
@@ -81,14 +80,6 @@ export default function ProductActions({
         image: selectedColor?.image ?? defaultImage ?? product.image,
         quantity: quantity,
         color: selectedColor?.colorName ?? "Default",
-      });
-
-      pixelAddToCart({
-        content_ids: [product._id],
-        content_name: product.title,
-        contents: [{ id: product._id, quantity, item_price: product.price, title: product.title }],
-        value: product.price * quantity,
-        quantity,
       });
 
       gtmAddToCart(

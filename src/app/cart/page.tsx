@@ -16,6 +16,7 @@ import {
 import Link from "next/link";
 import { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import { useDeliveryCharge } from "@/hooks/useDeliveryCharge";
+import { gtmViewCart } from "@/lib/gtm";
 
 // helpers
 const toNum = (v: unknown, f = 0) =>
@@ -36,6 +37,17 @@ export default function CartPage() {
   const removeItem = useCartStore((s) => s.removeItem);
   const clearCart = useCartStore((s) => s.clearCart);
   const getTotalPrice = useCartStore((s) => s.getTotalPrice);
+
+  const viewCartFired = useRef(false);
+  useEffect(() => {
+    if (!items.length || viewCartFired.current) return;
+    viewCartFired.current = true;
+    gtmViewCart(
+      items.map((i) => ({ item_id: i._id, item_name: i.title, price: i.price, quantity: i.quantity })),
+      items.reduce((acc, i) => acc + i.price * i.quantity, 0)
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // UI local state
   const [loadingId, setLoadingId] = useState<string | null>(null);

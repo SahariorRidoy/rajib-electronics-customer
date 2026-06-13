@@ -7,7 +7,7 @@ import { fetchProduct, fetchProducts } from "@/services/catalog";
 import type { Product } from "@/types";
 import ProductDetailClient from "@/components/product/ProductDetailClient";
 import ProductCard from "@/components/ProductCard";
-import PixelViewContent from "@/components/product/PixelViewContent";
+import GtmViewItem from "@/components/product/GtmViewItem";
 
 export const revalidate = 0;
 export const dynamic = "force-dynamic";
@@ -130,7 +130,7 @@ export default async function ProductDetailsPage({
 
   return (
     <div className="min-h-screen bg-[#F5FDF8] mt-6">
-      <PixelViewContent
+      <GtmViewItem
         productId={product._id}
         title={product.title}
         price={product.price}

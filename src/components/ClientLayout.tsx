@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
+import { gtmPageView } from "@/lib/gtm";
 import Footer from "./Footer";
 import Topbar from "./Topbar";
 import AuthProvider from "./AuthProvider";
@@ -35,6 +36,10 @@ export default function ClientLayout({
 }) {
   useSupressExtensionParamWarnings();
   const pathname = usePathname();
+
+  useEffect(() => {
+    gtmPageView(pathname);
+  }, [pathname]);
   const isAuthPage = ['/login', '/register', '/forgot-password', '/reset-password'].includes(pathname);
 
   return (

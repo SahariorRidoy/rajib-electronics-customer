@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import toast from "react-hot-toast";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { X, User, CheckCircle, LogIn } from "lucide-react";
 import { useCartStore } from "@/store/cartStore";
 import { createOrder } from "@/services/orders";
@@ -14,7 +14,6 @@ import OrderSummaryCard from "@/components/checkout/OrderSummaryCard";
 import { useDeliveryCharge } from "@/hooks/useDeliveryCharge";
 import { useCustomerInfo } from "@/hooks/useCustomerInfo";
 import { usePublicSettings } from "@/hooks/usePublicSettings";
-import { pixelInitiateCheckout, pixelPurchase } from "@/lib/pixel";
 import { gtmBeginCheckout, gtmPurchase } from "@/lib/gtm";
 
 
@@ -48,28 +47,16 @@ export default function CheckoutPage() {
 
   useEffect(() => setMounted(true), []);
 
-  // Fire InitiateCheckout once when page mounts with items
-  const hasItems = items.length > 0;
+  const beginCheckoutFired = useRef(false);
   useEffect(() => {
-    if (!hasItems) return;
-    pixelInitiateCheckout({
-      content_ids: items.map((i) => i._id),
-      contents: items.map((i) => ({
-        id: i._id,
-        quantity: i.quantity,
-        item_price: i.price,
-        title: i.title,
-      })),
-      num_items: items.reduce((a, i) => a + i.quantity, 0),
-      value: subtotal,
-    });
-
+    if (!items.length || beginCheckoutFired.current) return;
+    beginCheckoutFired.current = true;
     gtmBeginCheckout(
       items.map((i) => ({ item_id: i._id, item_name: i.title, price: i.price, quantity: i.quantity })),
       subtotal
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hasItems]);
+  }, []);
 
   // 🧾 FIXED: handle order submit
   const handleSubmit = async (customerData: any) => {
@@ -115,19 +102,6 @@ export default function CheckoutPage() {
 
       if (result.ok) {
         toast.success("Order placed successfully!");
-
-        pixelPurchase({
-          content_ids: items.map((i) => i._id),
-          contents: items.map((i) => ({
-            id: i._id,
-            quantity: i.quantity,
-            item_price: i.price,
-            title: i.title,
-          })),
-          num_items: items.reduce((a, i) => a + i.quantity, 0),
-          value: total,
-          order_id: result.data?.orderId,
-        });
 
         gtmPurchase({
           transaction_id: result.data?.orderId ?? Date.now().toString(),
