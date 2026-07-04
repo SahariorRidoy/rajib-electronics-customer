@@ -37,26 +37,34 @@ export default function ProductSection({
   React.useEffect(() => {
     if (!mounted || !scrollRef.current) return;
     const scrollContainer = scrollRef.current;
-    let scrollInterval: NodeJS.Timeout;
+    let isPaused = false;
 
-    const startAutoScroll = () => {
-      scrollInterval = setInterval(() => {
-        if (scrollContainer) {
-          const cardWidth = scrollContainer.offsetWidth * 0.48 + 12;
-          const maxScroll = scrollContainer.scrollWidth - scrollContainer.offsetWidth;
-          
-          if (scrollContainer.scrollLeft >= maxScroll) {
-            scrollContainer.scrollTo({ left: 0, behavior: 'smooth' });
-          } else {
-            scrollContainer.scrollBy({ left: cardWidth * 2, behavior: 'smooth' });
-          }
-        }
-      }, 3000);
+    const pause = () => { isPaused = true; };
+    const resume = () => { isPaused = false; };
+
+    scrollContainer.addEventListener("touchstart", pause, { passive: true });
+    scrollContainer.addEventListener("touchend", resume, { passive: true });
+    scrollContainer.addEventListener("mouseenter", pause);
+    scrollContainer.addEventListener("mouseleave", resume);
+
+    const scrollInterval = setInterval(() => {
+      if (isPaused || !scrollContainer) return;
+      const cardWidth = scrollContainer.offsetWidth * 0.48 + 12;
+      const maxScroll = scrollContainer.scrollWidth - scrollContainer.offsetWidth;
+      if (scrollContainer.scrollLeft >= maxScroll) {
+        scrollContainer.scrollTo({ left: 0, behavior: "smooth" });
+      } else {
+        scrollContainer.scrollBy({ left: cardWidth * 2, behavior: "smooth" });
+      }
+    }, 3000);
+
+    return () => {
+      clearInterval(scrollInterval);
+      scrollContainer.removeEventListener("touchstart", pause);
+      scrollContainer.removeEventListener("touchend", resume);
+      scrollContainer.removeEventListener("mouseenter", pause);
+      scrollContainer.removeEventListener("mouseleave", resume);
     };
-
-    startAutoScroll();
-
-    return () => clearInterval(scrollInterval);
   }, [mounted, products.length]);
   // Loading skeleton
   if (loading) {

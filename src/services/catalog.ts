@@ -62,6 +62,7 @@ function buildURL(path: string, params?: Query) {
 /* ⚙️ OPTIMIZED FETCH: in-memory cache + dedupe + small retry                  */
 /* -------------------------------------------------------------------------- */
 
+const MAX_CACHE_SIZE = 50; // prevent unbounded growth
 const requestCache = new Map<string, Promise<any>>();
 const cacheTTL = 5000; // short-term cache to avoid duplicate bursts
 
@@ -79,7 +80,7 @@ async function getJSON<T>(path: string, params?: Query): Promise<T> {
         const res = await fetch(url, {
           method: "GET",
           headers: { "content-type": "application/json" },
-          cache: "no-store",
+          next: { revalidate: 60 },
         });
 
         if (!res.ok) {
@@ -102,6 +103,11 @@ async function getJSON<T>(path: string, params?: Query): Promise<T> {
     throw new Error("Unreachable");
   })();
 
+  // evict oldest entry if cache is too large
+  if (requestCache.size >= MAX_CACHE_SIZE) {
+    const firstKey = requestCache.keys().next().value;
+    if (firstKey) requestCache.delete(firstKey);
+  }
   requestCache.set(url, fetchPromise);
   setTimeout(() => requestCache.delete(url), cacheTTL);
   return fetchPromise;
@@ -507,52 +513,29 @@ export async function fetchBanners(params?: {
         ? categoryFiltered.slice(0, params.limit)
         : categoryFiltered;
 
-    // ✅ If we found banners, return them immediately
     if (final.length > 0) {
       return { ok: true as const, data: final };
     }
 
-    // If category was specified but no banners found, return empty array
-    // This allows CategoryView to use the category image as fallback
     if (params?.category) {
       return { ok: true as const, data: [] };
     }
 
-    /* ------------------------------------------------------------------
-       🚨 No banner found: Fetch fallback banner from DB (industry standard)
-       ------------------------------------------------------------------ */
-    console.warn("⚠️ No banners found. Loading fallback banner from DB...");
+    // No banners found — return static fallback without a second network request
+    const staticFallback: Banner = {
+      _id: "fallback",
+      title: "Welcome to Rajib Electronics",
+      subtitle: "Best deals & offers, everyday!",
+      image: "https://res.cloudinary.com/dtges64tg/image/upload/v1762065479/Amarshop_default_fallback.webp",
+      discount: "0%",
+      position: "hero",
+      status: "ACTIVE",
+      sort: 999,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
 
-    const fallback = await getJSON<unknown>("/banners?status=ACTIVE&limit=1");
-
-    let fallbackArr: Banner[] = [];
-    if (fallback && typeof fallback === "object" && "data" in (fallback as Record<string, unknown>)) {
-      const obj = fallback as { data?: Banner[] };
-      fallbackArr = Array.isArray(obj.data) ? obj.data : [];
-    } else if (Array.isArray(fallback)) {
-      fallbackArr = fallback as Banner[];
-    }
-
-    // 6️⃣ Select only the latest fallback banner (or dummy if none)
-    const fallbackBanner =
-      fallbackArr.length > 0
-        ? fallbackArr[0]
-        : ({
-            _id: "fallback",
-            title: "Welcome to Rajib Electronics",
-            subtitle: "Best deals & offers, everyday!",
-            image:
-              "https://res.cloudinary.com/dtges64tg/image/upload/v1762065479/Amarshop_default_fallback.webp",
-            discount: "0%",
-            position: "hero",
-            status: "ACTIVE",
-            sort: 999,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-          } as Banner);
-
-
-    return { ok: true as const, data: [fallbackBanner] };
+    return { ok: true as const, data: [staticFallback] };
   } catch (error) {
     console.error("Failed to fetch banners:", error);
 

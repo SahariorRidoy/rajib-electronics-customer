@@ -7,14 +7,8 @@ export function useIsMobile(bp = 640) {
     const mql = window.matchMedia(`(max-width:${bp - 1}px)`);
     const onChange = (e: MediaQueryListEvent) => setIsMobile(e.matches);
     setIsMobile(mql.matches);
-    mql.addEventListener?.("change", onChange);
-    
-    mql.addListener?.(onChange);
-    return () => {
-      mql.removeEventListener?.("change", onChange);
-      
-      mql.removeListener?.(onChange);
-    };
+    mql.addEventListener("change", onChange);
+    return () => mql.removeEventListener("change", onChange);
   }, [bp]);
   return isMobile;
 }

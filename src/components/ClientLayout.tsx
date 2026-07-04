@@ -6,7 +6,6 @@ import { gtmPageView } from "@/lib/gtm";
 import Footer from "./Footer";
 import Topbar from "./Topbar";
 import AuthProvider from "./AuthProvider";
-import AuthDebug from "./AuthDebug";
 import FloatingChat from "./FloatingChat";
 
 // Suppress Next.js 15 params/searchParams Proxy warnings triggered by
@@ -54,7 +53,6 @@ export default function ClientLayout({
             <Footer />
           </div>
           <FloatingChat />
-          <AuthDebug />
         </div>
       )}
     </AuthProvider>

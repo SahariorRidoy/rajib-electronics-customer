@@ -5,13 +5,13 @@
 import React, { useMemo, useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { CldImage } from "@/lib/cdn";
-import { motion } from "framer-motion";
 import { Plus, Minus } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import type { AppProduct } from "@/types/product";
 import { useCartStore } from "@/store/cartStore";
 import { gtmAddToCart } from "@/lib/gtm";
+import { useIsMobile } from "@/hooks/useIsMobile";
 
 type Props = {
   product: AppProduct | any;
@@ -39,6 +39,8 @@ export default function ProductCard({
   const addItem = useCartStore((s) => s.addItem);
   const setItem = useCartStore((s) => s.setItem);
   const cartItems = useCartStore((s) => s.items);
+
+  const isMobile = useIsMobile();
 
   const title = String(product?.title ?? product?.name ?? "Untitled");
   const slug = String(product?.slug ?? product?._id ?? "");
@@ -192,10 +194,8 @@ export default function ProductCard({
      (kept unchanged aside from wrapping)
      ----------------------- */
   const DesktopCard = (
-    <motion.article
-      whileHover={{ y: -6 }}
-      transition={{ duration: 0.25 }}
-      className={`group bg-white rounded-2xl shadow-sm transition-shadow overflow-hidden border border-gray-100 flex flex-col ${
+    <article
+      className={`group bg-white rounded-2xl shadow-sm hover:-translate-y-1.5 transition-all duration-200 overflow-hidden border border-gray-100 flex flex-col ${
         compact ? "p-3" : "p-4"
       }`}
     >
@@ -330,7 +330,7 @@ export default function ProductCard({
           </div>
         </div>
       </div>
-    </motion.article>
+    </article>
   );
 
   /* -----------------------
@@ -428,14 +428,6 @@ export default function ProductCard({
     </article>
   );
 
-  // Render: show MobileCard only on small screens and DesktopCard hidden on small screens.
-  return (
-    <>
-      {/* Mobile card (visible only below lg) */}
-      {MobileCard}
-
-      {/* Desktop / larger screens */}
-      <div className="hidden lg:block">{DesktopCard}</div>
-    </>
-  );
+  // Render only the appropriate card — never both — to halve DOM size and memory
+  return isMobile ? MobileCard : DesktopCard;
 }

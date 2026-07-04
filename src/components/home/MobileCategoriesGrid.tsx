@@ -23,26 +23,34 @@ export default function MobileCategoriesGrid({
   useEffect(() => {
     if (!isMounted || !scrollRef.current || loading) return;
     const scrollContainer = scrollRef.current;
-    let scrollInterval: NodeJS.Timeout;
+    let isPaused = false;
 
-    const startAutoScroll = () => {
-      scrollInterval = setInterval(() => {
-        if (scrollContainer) {
-          const cardWidth = scrollContainer.offsetWidth * 0.32 + 12;
-          const maxScroll = scrollContainer.scrollWidth - scrollContainer.offsetWidth;
-          
-          if (scrollContainer.scrollLeft >= maxScroll) {
-            scrollContainer.scrollTo({ left: 0, behavior: 'smooth' });
-          } else {
-            scrollContainer.scrollBy({ left: cardWidth * 2, behavior: 'smooth' });
-          }
-        }
-      }, 3000);
+    const pause = () => { isPaused = true; };
+    const resume = () => { isPaused = false; };
+
+    scrollContainer.addEventListener("touchstart", pause, { passive: true });
+    scrollContainer.addEventListener("touchend", resume, { passive: true });
+    scrollContainer.addEventListener("mouseenter", pause);
+    scrollContainer.addEventListener("mouseleave", resume);
+
+    const scrollInterval = setInterval(() => {
+      if (isPaused || !scrollContainer) return;
+      const cardWidth = scrollContainer.offsetWidth * 0.32 + 12;
+      const maxScroll = scrollContainer.scrollWidth - scrollContainer.offsetWidth;
+      if (scrollContainer.scrollLeft >= maxScroll) {
+        scrollContainer.scrollTo({ left: 0, behavior: "smooth" });
+      } else {
+        scrollContainer.scrollBy({ left: cardWidth * 2, behavior: "smooth" });
+      }
+    }, 3000);
+
+    return () => {
+      clearInterval(scrollInterval);
+      scrollContainer.removeEventListener("touchstart", pause);
+      scrollContainer.removeEventListener("touchend", resume);
+      scrollContainer.removeEventListener("mouseenter", pause);
+      scrollContainer.removeEventListener("mouseleave", resume);
     };
-
-    startAutoScroll();
-
-    return () => clearInterval(scrollInterval);
   }, [isMounted, loading, categories.length]);
 
   // FIX: Safe early return
@@ -112,12 +120,13 @@ export default function MobileCategoriesGrid({
                     }
                   }}
                 >
-                  <div className="w-full aspect-square rounded-md overflow-hidden bg-gray-50 flex items-center justify-center p-1">
-                    <img
-                      src={cat.images?.[0] || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect width='100' height='100' fill='%23f3f4f6'/%3E%3C/svg%3E"}
+                  <div className="relative w-full aspect-square rounded-md overflow-hidden bg-gray-50">
+                    <Image
+                      src={cat.images?.[0] || ""}
                       alt={cat.title}
-                      style={{ maxWidth: '100%', maxHeight: '100%', width: 'auto', height: 'auto' }}
-                      onError={(e) => { e.currentTarget.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect width='100' height='100' fill='%23f3f4f6'/%3E%3C/svg%3E"; }}
+                      fill
+                      sizes="(max-width: 640px) 30vw, 20vw"
+                      className="object-contain p-1"
                     />
                   </div>
                   <p className="basis-[20%] flex items-center justify-center text-[13px] font-extrabold text-gray-800 text-center px-1 leading-tight line-clamp-2">

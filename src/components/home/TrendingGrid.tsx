@@ -7,7 +7,6 @@ import { useEffect, useMemo, useState, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useCartStore } from "@/store/cartStore";
 import { toast } from "react-hot-toast";
-import { createOrder } from "@/services/orders";
 import type { AppProduct } from "@/types/product";
 
 interface TrendingGridProps {
@@ -37,7 +36,6 @@ const DEFAULT_IMAGE =
   );
 const LOW_STOCK_THRESHOLD = 5;
 const MAX_INITIAL_DISPLAY = 8;
-const MAX_MOBILE_DISPLAY = 4;
 const formatPrice = (v: number) => `৳${Number(v || 0).toLocaleString("en-BD")}`;
 
 const calculateDiscount = (price = 0, compare = 0): number => {
@@ -248,26 +246,34 @@ export default function TrendingGrid({
   useEffect(() => {
     if (!mounted || !scrollRef.current) return;
     const scrollContainer = scrollRef.current;
-    let scrollInterval: NodeJS.Timeout;
+    let isPaused = false;
 
-    const startAutoScroll = () => {
-      scrollInterval = setInterval(() => {
-        if (scrollContainer) {
-          const cardWidth = scrollContainer.offsetWidth * 0.48 + 12;
-          const maxScroll = scrollContainer.scrollWidth - scrollContainer.offsetWidth;
-          
-          if (scrollContainer.scrollLeft >= maxScroll) {
-            scrollContainer.scrollTo({ left: 0, behavior: 'smooth' });
-          } else {
-            scrollContainer.scrollBy({ left: cardWidth * 2, behavior: 'smooth' });
-          }
-        }
-      }, 3000);
+    const pause = () => { isPaused = true; };
+    const resume = () => { isPaused = false; };
+
+    scrollContainer.addEventListener("touchstart", pause, { passive: true });
+    scrollContainer.addEventListener("touchend", resume, { passive: true });
+    scrollContainer.addEventListener("mouseenter", pause);
+    scrollContainer.addEventListener("mouseleave", resume);
+
+    const scrollInterval = setInterval(() => {
+      if (isPaused || !scrollContainer) return;
+      const cardWidth = scrollContainer.offsetWidth * 0.48 + 12;
+      const maxScroll = scrollContainer.scrollWidth - scrollContainer.offsetWidth;
+      if (scrollContainer.scrollLeft >= maxScroll) {
+        scrollContainer.scrollTo({ left: 0, behavior: "smooth" });
+      } else {
+        scrollContainer.scrollBy({ left: cardWidth * 2, behavior: "smooth" });
+      }
+    }, 3000);
+
+    return () => {
+      clearInterval(scrollInterval);
+      scrollContainer.removeEventListener("touchstart", pause);
+      scrollContainer.removeEventListener("touchend", resume);
+      scrollContainer.removeEventListener("mouseenter", pause);
+      scrollContainer.removeEventListener("mouseleave", resume);
     };
-
-    startAutoScroll();
-
-    return () => clearInterval(scrollInterval);
   }, [mounted, computedProducts.length]);
 
   const handleBuyNow = useCallback(
@@ -362,10 +368,10 @@ export default function TrendingGrid({
           {computedProducts.map((prod) => (
             <div
               key={prod.p._id}
-              className="bg-white min-w-[48%] max-w-[48%] flex-shrink-0 rounded-md overflow-hidden border border-cyan-300 shadow-sm p-2 flex flex-col gap-1"
+              className="bg-white min-w-[48%] max-w-[48%] shrink-0 rounded-md overflow-hidden border border-cyan-300 shadow-sm p-2 flex flex-col gap-1"
             >
               <div className="w-full">
-                <div className="relative w-full aspect-[4/3] rounded-md overflow-hidden border bg-white">
+                <div className="relative w-full aspect-4/3 rounded-md overflow-hidden border bg-white">
                   {prod.discount > 0 && (
                     <span className="absolute top-1 left-1 bg-pink-600 text-white px-2 py-0.5 rounded-full text-[10px] font-bold z-10">
                       {prod.discount}% OFF
@@ -426,7 +432,7 @@ export default function TrendingGrid({
                 <button
                   onClick={() => handleBuyNow(prod)}
                   disabled={prod.isOutOfStock || !!loadingStates[prod.p._id]}
-                  className="flex-1 px-1 py-1.5 bg-gradient-to-r from-pink-600 to-rose-600 text-white rounded-md text-[10px] font-medium disabled:opacity-50 whitespace-nowrap"
+                  className="flex-1 px-1 py-1.5 bg-linear-to-r from-pink-600 to-rose-600 text-white rounded-md text-[10px] font-medium disabled:opacity-50 whitespace-nowrap"
                 >
                   {loadingStates[prod.p._id] ? "Processing..." : "Buy Now"}
                 </button>
@@ -437,7 +443,7 @@ export default function TrendingGrid({
           {/* See All Card */}
           <Link
             href="/search?tag=trending"
-            className="bg-white min-w-[48%] max-w-[48%] flex-shrink-0 rounded-md border border-gray-200 shadow-sm p-2 flex flex-col items-center justify-center gap-2"
+            className="bg-white min-w-[48%] max-w-[48%] shrink-0 rounded-md border border-gray-200 shadow-sm p-2 flex flex-col items-center justify-center gap-2"
           >
             <div className="w-12 h-12 rounded-full bg-cyan-500 flex items-center justify-center">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="white" className="w-6 h-6">
@@ -456,7 +462,7 @@ export default function TrendingGrid({
               key={prod.p._id}
               className={`group bg-white rounded-2xl overflow-hidden border border-gray-200 shadow-sm ${prod.isOutOfStock ? "opacity-60 grayscale" : "hover:shadow-md hover:border-gray-300"} transition-all duration-300 h-full flex flex-col`}
             >
-              <div className="relative w-full aspect-[4/3] flex-shrink-0">
+              <div className="relative w-full aspect-4/3 shrink-0">
                 <Link
                   href={`/products/${prod.p.slug}`}
                   className="absolute inset-0 w-full h-full"
@@ -469,7 +475,7 @@ export default function TrendingGrid({
                 </Link>
                 {prod.discount > 0 && (
                   <div className="absolute top-3 left-3">
-                    <span className="bg-gradient-to-r from-pink-600 to-rose-600 text-white text-xs font-bold px-2 py-1 rounded-full shadow-sm">
+                    <span className="bg-linear-to-r from-pink-600 to-rose-600 text-white text-xs font-bold px-2 py-1 rounded-full shadow-sm">
                       {prod.discount}% OFF
                     </span>
                   </div>

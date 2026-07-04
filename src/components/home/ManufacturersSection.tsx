@@ -8,14 +8,19 @@ import { useIsMobile } from "@/hooks/useIsMobile";
 import MobileManufacturersGrid from "./MobileManufacturersGrid";
 
 export default function ManufacturersSection() {
-  const { data, isLoading } = useGetManufacturersQuery();
-  const manufacturers = data?.data || [];
   const isMobile = useIsMobile();
 
-  // Use mobile grid on mobile devices
+  // On mobile, delegate entirely to MobileManufacturersGrid which has its own query
   if (isMobile) {
     return <MobileManufacturersGrid />;
   }
+
+  return <ManufacturersSectionDesktop />;
+}
+
+function ManufacturersSectionDesktop() {
+  const { data, isLoading } = useGetManufacturersQuery();
+  const manufacturers = data?.data || [];
 
   if (isLoading) {
     return (

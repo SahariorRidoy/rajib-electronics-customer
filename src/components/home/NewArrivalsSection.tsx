@@ -9,6 +9,7 @@ import type { AppProduct } from "@/types/product";
 import ProductCard from "../ProductCard";
 
 const PAGE_LIMIT = 12;
+const MAX_PAGES = 5; // max 36 products — prevents out-of-memory on infinite scroll
 
 export default function NewArrivalsSection() {
   const [products, setProducts] = useState<AppProduct[]>([]);
@@ -36,12 +37,14 @@ export default function NewArrivalsSection() {
         (p) => Number(p.stock ?? p.availableStock ?? 0) > 0
       );
 
-      setProducts((prev) =>
-        pageNum === 1 ? inStock : [...prev, ...inStock]
-      );
+      setProducts((prev) => {
+        const next = pageNum === 1 ? inStock : [...prev, ...inStock];
+        // hard cap to prevent unbounded memory growth
+        return next.slice(0, MAX_PAGES * PAGE_LIMIT);
+      });
 
-      // if fewer items returned than limit, no more pages
-      setHasMore(items.length >= PAGE_LIMIT);
+      // stop if fewer items than limit OR we've hit the max page cap
+      setHasMore(items.length >= PAGE_LIMIT && pageNum < MAX_PAGES);
     } catch (err) {
       console.error("NewArrivalsSection fetch error:", err);
       setHasMore(false);
@@ -115,7 +118,7 @@ export default function NewArrivalsSection() {
             Array.from({ length: PAGE_LIMIT }).map((_, i) => (
               <div
                 key={`skel-${i}`}
-                className="bg-gray-200 animate-pulse rounded-2xl aspect-[3/4]"
+                className="bg-gray-200 animate-pulse rounded-2xl aspect-3/4"
               />
             ))}
         </div>

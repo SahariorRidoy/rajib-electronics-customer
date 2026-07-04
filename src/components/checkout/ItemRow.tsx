@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import { motion } from "framer-motion";
 import Image from "@/lib/image";
 import { Plus, Minus, X } from "lucide-react";
 import { useCartStore } from "@/store/cartStore";
@@ -38,7 +37,7 @@ export default React.memo(function ItemRow({
   const removeItem = useCartStore((s) => s.removeItem);
 
   return (
-    <motion.div className="flex items-center gap-3 p-3 bg-[#F5FDF8] rounded-xl border border-pink-100 relative">
+    <div className="flex items-center gap-3 p-3 bg-[#F5FDF8] rounded-xl border border-pink-100 relative">
       <div className="relative aspect-[4/3] w-16 flex-shrink-0 rounded-lg bg-pink-100 overflow-hidden">
         {item.image ? (
           <Image
@@ -65,7 +64,7 @@ export default React.memo(function ItemRow({
             aria-label="Decrease quantity"
             onClick={() => updateQuantity(item._id, qty - 1)}
             disabled={qty <= 1}
-            className="w-6 h-6 flex items-center justify-center rounded bg-pink-100 disabled:opacity-50"
+            className="w-6 h-6 flex items-center cursor-pointer justify-center rounded bg-pink-100 disabled:opacity-50"
           >
             <Minus className="w-3 h-3 text-pink-700" />
           </button>
@@ -76,14 +75,14 @@ export default React.memo(function ItemRow({
             aria-label="Increase quantity"
             onClick={() => updateQuantity(item._id, qty + 1)}
             disabled={atMax || outOfStock}
-            className="w-6 h-6 flex items-center justify-center rounded bg-pink-100 disabled:opacity-50"
+            className="w-6 h-6 flex items-center cursor-pointer justify-center rounded bg-pink-100 disabled:opacity-50"
           >
             <Plus className="w-3 h-3 text-pink-700" />
           </button>
         </div>
       </div>
 
-      <div className="font-bold text-pink-600">{money(lineTotal)}</div>
+      <div className="font-bold text-pink-600 text-sm shrink-0">{money(lineTotal)}</div>
       <button
         aria-label={`Remove ${item.title}`}
         onClick={() => removeItem(item._id)}
@@ -91,6 +90,6 @@ export default React.memo(function ItemRow({
       >
         <X className="w-3.5 h-3.5" />
       </button>
-    </motion.div>
+    </div>
   );
 });

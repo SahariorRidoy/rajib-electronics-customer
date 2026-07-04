@@ -136,7 +136,7 @@ export const catalogApi = createApi({
               { type: "Product" as const, id: "LIST" },
             ]
           : [{ type: "Product" as const, id: "LIST" }],
-      keepUnusedDataFor: 30,
+      keepUnusedDataFor: 60,
     }),
 
     /* ---------- NEW: getProductsPaginated (recommended) ---------- */

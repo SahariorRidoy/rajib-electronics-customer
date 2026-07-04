@@ -9,7 +9,7 @@ import Image from "@/lib/image";
 import Link from "next/link";
 import { useCartStore } from "@/store/cartStore";
 import { toast } from "react-hot-toast";
-import { useConfirmOrderMutation } from "@/services/catalog.api"; // adjust if needed
+import { useRouter } from "next/navigation";
 
 interface Meta {
   total: number;
@@ -102,12 +102,9 @@ export default function ProductsGridClient({
   const [localStockDelta, setLocalStockDelta] = useState<
     Record<string, number>
   >({});
-  const [confirmOrder] = useConfirmOrderMutation();
+  const router = useRouter();
   const cartItems = useCartStore((s) => s.items);
   const addItem = useCartStore((s) => s.addItem);
-  const removeItem = useCartStore((s: any) =>
-    s.removeItem ? s.removeItem : () => {}
-  );
 
   // initialize quantities for visible items whenever items change
   useEffect(() => {
@@ -257,28 +254,9 @@ export default function ProductsGridClient({
         });
 
         // confirm order with server (mutation)
-        // const payload = { items: [{ _id: id, quantity: qty }] };
-        // const response = await confirmOrder(payload).unwrap();
-
-        // if (response?.ok) {
-        //   try {
-        //     (removeItem as any)(id);
-        //   } catch (e) {
-        //     /* ignore if removeItem not present */
-        //   }
-
-        //   // optimistic local stock delta (optional)
-        //   setLocalStockDelta((prev) => ({
-        //     ...prev,
-        //     [id]: (prev[id] ?? 0) - qty,
-        //   }));
-        // }
-
         setQuantities((prev) => ({ ...prev, [id]: 1 }));
         toast.success(`${qty} × ${p.title} added to cart`);
-        setTimeout(() => {
-          if (typeof window !== "undefined") window.location.href = "/cart";
-        }, 500);
+        router.push("/cart");
       } catch (err: any) {
         console.error("Buy Now failed:", err);
         toast.error("Could not add to cart. Please try again.");

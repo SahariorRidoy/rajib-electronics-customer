@@ -1,6 +1,5 @@
 import { useSelector, useDispatch } from "react-redux";
-import { selectUser, selectToken, selectIsAuthed, selectIsAuthHydrated, hydrateFromStorage, logout } from "@/store/authSlice";
-import { useEffect } from "react";
+import { selectUser, selectToken, selectIsAuthed, selectIsAuthHydrated, logout } from "@/store/authSlice";
 
 export const useAuth = () => {
   const dispatch = useDispatch();
@@ -9,17 +8,11 @@ export const useAuth = () => {
   const isAuthed = useSelector(selectIsAuthed);
   const isHydrated = useSelector(selectIsAuthHydrated);
 
-  useEffect(() => {
-    if (!isHydrated) {
-      dispatch(hydrateFromStorage());
-    }
-  }, [dispatch, isHydrated]);
-
   const handleLogout = () => {
     dispatch(logout());
     if (typeof window !== "undefined") {
-      const event = new CustomEvent('showToast', { 
-        detail: { message: 'Logged out successfully', type: 'success' } 
+      const event = new CustomEvent("showToast", {
+        detail: { message: "Logged out successfully", type: "success" },
       });
       window.dispatchEvent(event);
       setTimeout(() => {

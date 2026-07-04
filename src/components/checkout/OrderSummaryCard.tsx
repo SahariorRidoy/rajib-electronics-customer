@@ -33,7 +33,7 @@ export default function OrderSummaryCard({
         <span>Order Summary</span>
       </h2>
 
-      <div className="space-y-3 max-h-[400px] overflow-y-auto pr-1">
+      <div className="space-y-3 max-h-[400px] overflow-y-auto overflow-x-hidden pr-1">
         {items.map((it) => (
           <ItemRow key={it._id} item={it} />
         ))}
@@ -46,7 +46,7 @@ export default function OrderSummaryCard({
         </div>
         <div className="flex justify-between items-center">
           <span>
-            Delivery
+            Delivery Charge
             {zone && (
               <span className="ml-1 text-xs text-gray-400">({zoneLabel})</span>
             )}

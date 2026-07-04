@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Building2, ChevronRight as ArrowRight } from "lucide-react";
 import { useEffect, useRef } from "react";
+import Image from "@/lib/image";
 import { useGetManufacturersQuery } from "@/services/catalog.api";
 
 export default function MobileManufacturersGrid() {
@@ -13,26 +14,34 @@ export default function MobileManufacturersGrid() {
   useEffect(() => {
     if (!scrollRef.current || isLoading) return;
     const scrollContainer = scrollRef.current;
-    let scrollInterval: NodeJS.Timeout;
+    let isPaused = false;
 
-    const startAutoScroll = () => {
-      scrollInterval = setInterval(() => {
-        if (scrollContainer) {
-          const cardWidth = scrollContainer.offsetWidth * 0.32 + 12;
-          const maxScroll = scrollContainer.scrollWidth - scrollContainer.offsetWidth;
-          
-          if (scrollContainer.scrollLeft >= maxScroll) {
-            scrollContainer.scrollTo({ left: 0, behavior: 'smooth' });
-          } else {
-            scrollContainer.scrollBy({ left: cardWidth * 2, behavior: 'smooth' });
-          }
-        }
-      }, 3000);
+    const pause = () => { isPaused = true; };
+    const resume = () => { isPaused = false; };
+
+    scrollContainer.addEventListener("touchstart", pause, { passive: true });
+    scrollContainer.addEventListener("touchend", resume, { passive: true });
+    scrollContainer.addEventListener("mouseenter", pause);
+    scrollContainer.addEventListener("mouseleave", resume);
+
+    const scrollInterval = setInterval(() => {
+      if (isPaused || !scrollContainer) return;
+      const cardWidth = scrollContainer.offsetWidth * 0.32 + 12;
+      const maxScroll = scrollContainer.scrollWidth - scrollContainer.offsetWidth;
+      if (scrollContainer.scrollLeft >= maxScroll) {
+        scrollContainer.scrollTo({ left: 0, behavior: "smooth" });
+      } else {
+        scrollContainer.scrollBy({ left: cardWidth * 2, behavior: "smooth" });
+      }
+    }, 3000);
+
+    return () => {
+      clearInterval(scrollInterval);
+      scrollContainer.removeEventListener("touchstart", pause);
+      scrollContainer.removeEventListener("touchend", resume);
+      scrollContainer.removeEventListener("mouseenter", pause);
+      scrollContainer.removeEventListener("mouseleave", resume);
     };
-
-    startAutoScroll();
-
-    return () => clearInterval(scrollInterval);
   }, [isLoading, manufacturers.length]);
 
   const items = Array.isArray(manufacturers) ? manufacturers.slice(0, 12) : [];
@@ -72,18 +81,19 @@ export default function MobileManufacturersGrid() {
                   href={`/manufacturer/${manufacturer.slug}`}
                   className="group min-w-[48%] max-w-[48%] shrink-0 h-[80px] rounded-md border border-gray-200 bg-white hover:shadow-md hover:border-cyan-300 transition overflow-hidden"
                 >
-                  <div className="w-full h-full bg-gray-50 flex items-center justify-center">
+                  <div className="relative w-full h-full">
                     {manufacturer.image ? (
-                      <img
+                      <Image
                         src={manufacturer.image}
                         alt={manufacturer.name}
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          e.currentTarget.style.display = 'none';
-                        }}
+                        fill
+                        sizes="(max-width: 640px) 48vw"
+                        className="object-cover"
                       />
                     ) : (
-                      <Building2 className="w-6 h-6 text-gray-400" />
+                      <div className="w-full h-full flex items-center justify-center">
+                        <Building2 className="w-6 h-6 text-gray-400" />
+                      </div>
                     )}
                   </div>
                 </Link>

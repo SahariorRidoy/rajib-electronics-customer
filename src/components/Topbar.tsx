@@ -23,6 +23,7 @@ import {
 import { useAuth } from "@/hooks/useAuth";
 import { Category } from "@/lib/schemas";
 import { usePublicSettings } from "@/hooks/usePublicSettings";
+import { useGetCategoriesQuery } from "@/services/catalog.api";
 
 function TopbarLogout() {
   const { isAuthed, logout } = useAuth();
@@ -70,19 +71,19 @@ function TopbarInner() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [chatDrawerOpen, setChatDrawerOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [categoriesLoading, setCategoriesLoading] = useState(true);
-  const [categoriesError, setCategoriesError] = useState<string | null>(null);
   const [placeholderIndex, setPlaceholderIndex] = useState(0);
+  const placeholderIndexRef = useRef(0);
   const [suggestions, setSuggestions] = useState<{ _id: string; title: string; slug: string; image?: string; images?: string[]; price?: number }[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [suggestionsLoading, setSuggestionsLoading] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
 
-  const cartItems = useCartStore((s) => s.items);
-  const cartCount = useMemo(
-    () => cartItems.reduce((sum, item) => sum + item.quantity, 0),
-    [cartItems]
+  // Use RTK Query — shares cache with page.tsx, no duplicate network request
+  const { data: catRes } = useGetCategoriesQuery();
+  const categories: Category[] = (catRes?.data as Category[]) ?? [];
+
+  const cartCount = useCartStore((s) =>
+    s.items.reduce((sum, item) => sum + item.quantity, 0)
   );
 
   const { siteName: brand, activeLogo, socialLinks } = usePublicSettings();
@@ -103,40 +104,12 @@ function TopbarInner() {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setPlaceholderIndex((prev) => (prev + 1) % placeholders.length);
+      placeholderIndexRef.current = (placeholderIndexRef.current + 1) % placeholders.length;
+      setPlaceholderIndex(placeholderIndexRef.current);
     }, 2500);
     return () => clearInterval(interval);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  useEffect(() => {
-    const ac = new AbortController();
-    async function load() {
-      try {
-        setCategoriesLoading(true);
-        setCategoriesError(null);
-        if (!API_BASE) throw new Error("NEXT_PUBLIC_API_BASE_URL is missing");
-        const res = await fetch(`${API_BASE}/categories`, {
-          signal: ac.signal,
-          headers: { "content-type": "application/json" },
-          cache: "no-store",
-        });
-        if (!res.ok)
-          throw new Error(`Failed to load categories (${res.status})`);
-        const json = await res.json();
-        setCategories((json?.data ?? []) as Category[]);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } catch (err: any) {
-        if (err.name !== "AbortError") {
-          setCategoriesError(err.message || "Failed to fetch categories");
-          setCategories([]);
-        }
-      } finally {
-        setCategoriesLoading(false);
-      }
-    }
-    load();
-    return () => ac.abort();
-  }, [API_BASE]);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -152,7 +125,7 @@ function TopbarInner() {
       }
       setSuggestionsLoading(true);
       try {
-        const res = await fetch(`${API_BASE}/products?q=${encodeURIComponent(query)}&limit=50`, {
+        const res = await fetch(`${API_BASE}/products?q=${encodeURIComponent(query)}&limit=12`, {
           headers: { "content-type": "application/json" },
           cache: "no-store",
         });
@@ -322,21 +295,21 @@ function TopbarInner() {
             {/* ✅ Right: Actions */}
             <div className="flex items-center justify-end gap-2">
               <div className="hidden lg:flex gap-2">
-                <button className="px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white rounded-md text-sm font-semibold transition">
+                <button className="px-3 cursor-pointer py-1.5 bg-white/10 hover:bg-white/20 text-white rounded-md text-sm font-semibold transition">
                   বাং
                 </button>
-                <button className="px-3 py-1.5 bg-white text-cyan-600 rounded-md text-sm font-semibold">
+                <button className="px-3 cursor-pointer py-1.5 bg-white text-cyan-600 rounded-md text-sm font-semibold">
                   Eng
                 </button>
               </div>
               <Link href="/profile" aria-label="Profile">
                 <button className="p-2 bg-white/10 hover:bg-white/20 text-white rounded-xl transition">
-                  <User className="w-5 h-5" />
+                  <User className="w-5 h-5 cursor-pointer" />
                 </button>
               </Link>
               <Link href="/cart" aria-label="Cart" className="relative">
                 <button className="p-2 bg-white/10 hover:bg-white/20 text-white rounded-xl transition">
-                  <ShoppingCart className="w-5 h-5" />
+                  <ShoppingCart className="w-5 h-5 cursor-pointer" />
                 </button>
                 {cartCount > 0 && (
                   <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full px-1.5 py-0.5">

@@ -44,8 +44,12 @@ const nextConfig = {
     dangerouslyAllowSVG: true,
     minimumCacheTTL: 86400, // cache optimized images for 1 day
     remotePatterns: [
-      { protocol: "https", hostname: "**" },
-      { protocol: "http", hostname: "**" },
+      { protocol: "https", hostname: "res.cloudinary.com" },
+      { protocol: "https", hostname: "**.cloudinary.com" },
+      { protocol: "https", hostname: "rajib-electronics-backend.vercel.app" },
+      { protocol: "https", hostname: "**.vercel.app" },
+      { protocol: "https", hostname: "api.rajibelectronics.com" },
+      { protocol: "http", hostname: "localhost" },
     ],
   },
 };
