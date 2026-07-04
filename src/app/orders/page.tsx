@@ -2,7 +2,7 @@
 // app/my-orders/page.tsx - IMPROVED
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback } from "react";
 import {
   AlertCircle,
   Search,
@@ -30,50 +30,11 @@ export default function MyOrdersPage() {
     useCustomerOrders();
   const [renderKey, setRenderKey] = useState(0);
 
-  // local state for invoice checks
-  const [invoiceCache, setInvoiceCache] = useState<Record<string, any | null>>(
-    {}
-  );
-  const [loadingInvoice, setLoadingInvoice] = useState<Record<string, boolean>>(
-    {}
-  );
-
   // ✅ FORCE REFRESH FUNCTION
   const handleForceRefresh = async () => {
     await refetch();
     setRenderKey((prev) => prev + 1);
   };
-
-  const fetchInvoiceForOrder = useCallback(
-    async (orderId: string) => {
-      if (invoiceCache[orderId] !== undefined) return invoiceCache[orderId];
-
-      setLoadingInvoice((s) => ({ ...s, [orderId]: true }));
-      try {
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/invoices/by-order/${orderId}`
-        );
-
-        if (res.status === 404) {
-          setInvoiceCache((s) => ({ ...s, [orderId]: null }));
-          return null;
-        }
-
-        if (!res.ok) throw new Error(`Server ${res.status}`);
-
-        const invoice = await res.json();
-        setInvoiceCache((s) => ({ ...s, [orderId]: invoice }));
-        return invoice;
-      } catch (err) {
-        console.error("fetchInvoiceForOrder", err);
-        setInvoiceCache((s) => ({ ...s, [orderId]: null }));
-        return null;
-      } finally {
-        setLoadingInvoice((s) => ({ ...s, [orderId]: false }));
-      }
-    },
-    [invoiceCache]
-  );
 
   const handleOpenInvoice = (order: Order) => {
     router.push(`/invoices/guest/${order._id}`);

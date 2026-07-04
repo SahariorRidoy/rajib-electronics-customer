@@ -13,6 +13,7 @@ export default function OrderSummaryCard({
   isFreeDelivery,
   amountNeeded,
   total,
+  zone,
 }: {
   items: any[];
   subtotal: number;
@@ -21,7 +22,10 @@ export default function OrderSummaryCard({
   isFreeDelivery: boolean;
   amountNeeded: number;
   total: number;
+  zone?: "inside" | "outside";
 }) {
+  const zoneLabel = zone === "inside" ? "Inside Dhaka" : "Outside Dhaka";
+
   return (
     <div className="bg-white rounded-2xl shadow-lg p-5 border border-pink-100">
       <h2 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
@@ -40,8 +44,13 @@ export default function OrderSummaryCard({
           <span>Subtotal</span>
           <span>{money(subtotal)}</span>
         </div>
-        <div className="flex justify-between">
-          <span>Delivery</span>
+        <div className="flex justify-between items-center">
+          <span>
+            Delivery
+            {zone && (
+              <span className="ml-1 text-xs text-gray-400">({zoneLabel})</span>
+            )}
+          </span>
           <span>
             {deliveryLoading ? (
               <span className="text-gray-400 text-sm">Calculating...</span>
@@ -58,7 +67,6 @@ export default function OrderSummaryCard({
         </div>
       </div>
 
-      {/* Free Delivery Message */}
       {!isFreeDelivery && amountNeeded > 0 && (
         <div className="mt-4 bg-orange-50 border border-orange-200 rounded-lg p-3">
           <p className="text-sm text-orange-700">
@@ -67,7 +75,6 @@ export default function OrderSummaryCard({
         </div>
       )}
 
-      {/* Success Message */}
       {isFreeDelivery && deliveryCharge === 0 && (
         <div className="mt-4 bg-green-50 border border-green-200 rounded-lg p-3">
           <p className="text-sm text-green-700 font-semibold">

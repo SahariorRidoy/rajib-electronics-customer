@@ -24,6 +24,7 @@ export interface CartItem {
 interface CartStore {
   items: CartItem[];
   addItem: (item: CartItem) => void;
+  setItem: (item: CartItem) => void;
   removeItem: (id: string) => void;
   updateQuantity: (id: string, quantity: number) => void;
   clearCart: () => void;
@@ -44,46 +45,50 @@ export const useCartStore = create<CartStore>()(
 
         addItem: (newItem) => {
           try {
-            // sanitize input
             if (!newItem || typeof newItem._id !== "string") return;
             const id = String(newItem._id);
             let qty = Number(newItem.quantity || 1);
             if (!Number.isFinite(qty) || qty < 1) qty = 1;
 
-            // duplicate-click protection
             const now = Date.now();
             const last = lastAddTs.get(id) ?? 0;
-            if (now - last < DUPLICATE_PROTECT_MS) {
-              // ignore as likely duplicate quick-click
-              return;
-            }
+            if (now - last < DUPLICATE_PROTECT_MS) return;
             lastAddTs.set(id, now);
 
             set((state) => {
-              const existing = state.items.find((i) => i._id === id);
-              if (existing) {
-                // clamp result to avoid negative/NaN
-                const newQty = Math.max(1, (existing.quantity || 0) + qty);
-                return {
-                  items: state.items.map((i) =>
-                    i._id === id ? { ...i, quantity: newQty } : i
-                  ),
-                };
-              } else {
-                const safeItem: CartItem = {
-                  _id: id,
-                  title: String(newItem.title || ""),
-                  slug: newItem.slug,
-                  price: Number(newItem.price || 0),
-                  image: newItem.image,
-                  quantity: qty,
-                  color: newItem.color,
-                };
-                return { items: [...state.items, safeItem] };
-              }
+              // If already in cart, do NOT increment — keep existing qty
+              if (state.items.find((i) => i._id === id)) return state;
+              const safeItem: CartItem = {
+                _id: id,
+                title: String(newItem.title || ""),
+                slug: newItem.slug,
+                price: Number(newItem.price || 0),
+                image: newItem.image,
+                quantity: qty,
+                color: newItem.color,
+              };
+              return { items: [...state.items, safeItem] };
             });
           } catch (err) {
             console.error("cartStore.addItem error", err);
+          }
+        },
+
+        // setItem: always replaces qty (used by Buy Now)
+        setItem: (newItem) => {
+          try {
+            if (!newItem || typeof newItem._id !== "string") return;
+            const id = String(newItem._id);
+            let qty = Number(newItem.quantity || 1);
+            if (!Number.isFinite(qty) || qty < 1) qty = 1;
+            set((state) => {
+              if (state.items.find((i) => i._id === id)) {
+                return { items: state.items.map((i) => i._id === id ? { ...i, quantity: qty } : i) };
+              }
+              return { items: [...state.items, { _id: id, title: String(newItem.title || ""), slug: newItem.slug, price: Number(newItem.price || 0), image: newItem.image, quantity: qty, color: newItem.color }] };
+            });
+          } catch (err) {
+            console.error("cartStore.setItem error", err);
           }
         },
 

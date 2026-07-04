@@ -27,7 +27,7 @@ export default function ProductActions({
   const [isAdding, setIsAdding] = useState(false);
 
   // Cart store methods
-  const { addItem, items } = useCartStore();
+  const { addItem, setItem, items } = useCartStore();
 
   // Check if product is already in cart
   const existingCartItem = items.find((item) => item._id === product._id);
@@ -120,24 +120,24 @@ export default function ProductActions({
 
   // Buy now handler
   const handleBuyNow = async () => {
-    if (isInCart) {
-      toast.success("Product already in cart. Redirecting to checkout...");
-      setTimeout(() => router.push("/checkout"), 1000);
-      return;
-    }
-
     if (isOutOfStock) {
       toast.error("Sorry, this product is out of stock");
       return;
     }
-
     if (quantity > availableStock) {
       toast.error(`Only ${availableStock} items available in stock`);
       return;
     }
-
-    await handleAddToCart();
-    setTimeout(() => router.push("/checkout"), 1000);
+    setItem({
+      _id: product._id,
+      title: selectedColor ? `${product.title} - ${selectedColor.colorName}` : product.title,
+      slug: product.slug,
+      price: product.price,
+      image: selectedColor?.image ?? defaultImage ?? product.image,
+      quantity,
+      color: selectedColor?.colorName ?? "Default",
+    });
+    router.push("/cart");
   };
 
   return (

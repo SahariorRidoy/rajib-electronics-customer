@@ -70,7 +70,7 @@ export default function NewArrivalsSection() {
           });
         }
       },
-      { rootMargin: "200px" }
+      { rootMargin: "50px" }
     );
 
     observer.observe(sentinelRef.current);

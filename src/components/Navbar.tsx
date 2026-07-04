@@ -8,6 +8,7 @@ import { Search, ShoppingCart, Phone, Menu, X, Sparkles, User, LogOut } from "lu
 import { useCartStore } from "@/store/cartStore";
 import { useAuth } from "@/hooks/useAuth";
 import { usePublicSettings } from "@/hooks/usePublicSettings";
+import { useGetCategoriesQuery } from "@/services/catalog.api";
 
 interface Category {
   _id: string;
@@ -19,19 +20,20 @@ export default function Navbar() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
-  const [categories, setCategories] = useState<Category[]>([]);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const { phones } = usePublicSettings();
   const phone = phones[0] || "";
+
+  // Use RTK Query — shares cache with page.tsx, no duplicate network request
+  const { data: catRes } = useGetCategoriesQuery();
+  const categories: Category[] = (catRes?.data as Category[]) ?? [];
 
   // Zustand cart store
   const cartItems = useCartStore((state) => state.items);
   const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
   useEffect(() => {
-    fetchCategories();
-
     // Scroll listener for sticky navbar effect
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
@@ -39,17 +41,6 @@ export default function Navbar() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
-  const fetchCategories = async () => {
-    try {
-      const API = process.env.NEXT_PUBLIC_API_BASE_URL;
-      const response = await fetch(`${API}/categories`);
-      const data = await response.json();
-      setCategories(data.data?.data || []);
-    } catch (error) {
-      console.error("Error fetching categories:", error);
-    }
-  };
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();

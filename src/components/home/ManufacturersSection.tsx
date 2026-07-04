@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import Image from "@/lib/image";
-import { motion } from "framer-motion";
 import { Building2, ArrowRight } from "lucide-react";
 import { useGetManufacturersQuery } from "@/services/catalog.api";
 import { useIsMobile } from "@/hooks/useIsMobile";
@@ -67,12 +66,10 @@ export default function ManufacturersSection() {
       </div>
 
       <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3">
-        {displayManufacturers.map((manufacturer, index) => (
-          <motion.div
+        {displayManufacturers.map((manufacturer) => (
+          <div
             key={manufacturer._id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.05 }}
+            className="animate-fade-in"
           >
             <Link
               href={`/manufacturer/${manufacturer.slug}`}
@@ -92,7 +89,7 @@ export default function ManufacturersSection() {
                 )}
               </div>
             </Link>
-          </motion.div>
+          </div>
         ))}
       </div>
     </section>

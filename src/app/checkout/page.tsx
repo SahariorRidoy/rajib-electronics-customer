@@ -11,7 +11,7 @@ import { useCartStore } from "@/store/cartStore";
 import { createOrder } from "@/services/orders";
 import CustomerInfoForm from "@/components/checkout/CustomerInfoForm";
 import OrderSummaryCard from "@/components/checkout/OrderSummaryCard";
-import { useDeliveryCharge } from "@/hooks/useDeliveryCharge";
+import { useDeliveryCharge, type DeliveryZone } from "@/hooks/useDeliveryCharge";
 import { useCustomerInfo } from "@/hooks/useCustomerInfo";
 import { usePublicSettings } from "@/hooks/usePublicSettings";
 import { gtmBeginCheckout, gtmPurchase } from "@/lib/gtm";
@@ -33,12 +33,14 @@ export default function CheckoutPage() {
   const { phones } = usePublicSettings();
   const hotline = phones[0] || process.env.NEXT_PUBLIC_HOTLINE || "09611677379";
   
+  const [deliveryZone, setDeliveryZone] = useState<DeliveryZone>('outside');
+
   // Fetch delivery charge dynamically
-  const { deliveryInfo, loading: deliveryLoading } = useDeliveryCharge(subtotal);
+  const { deliveryInfo, loading: deliveryLoading } = useDeliveryCharge(subtotal, deliveryZone);
   const deliveryCharge = deliveryInfo?.deliveryCharge || 0;
   const isFreeDelivery = deliveryInfo?.isFree || false;
   const amountNeeded = deliveryInfo ? Math.max(0, deliveryInfo.freeDeliveryThreshold - subtotal) : 0;
-  
+
   const total = subtotal + deliveryCharge;
 
   const [mounted, setMounted] = useState(false);
@@ -88,6 +90,7 @@ export default function CheckoutPage() {
         shipping: deliveryCharge,
         grandTotal: total,
       },
+      deliveryZone,
     };
 
 
@@ -269,6 +272,47 @@ export default function CheckoutPage() {
                   </p>
                 </div>
               )}
+              {/* Delivery Zone Selector */}
+              <div className="mb-6 p-4 bg-gray-50 rounded-xl border border-gray-200">
+                <p className="text-sm font-semibold text-gray-700 mb-3">Delivery Location</p>
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setDeliveryZone('outside')}
+                    className={`flex flex-col items-center gap-1 py-3 px-4 rounded-xl border-2 transition-all ${
+                      deliveryZone === 'outside'
+                        ? 'border-[#167389] bg-[#167389]/10 text-[#167389]'
+                        : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300'
+                    }`}
+                  >
+                    <span className="text-lg">🚚</span>
+                    <span className="text-sm font-semibold">Outside Dhaka</span>
+                    {deliveryInfo && (
+                      <span className="text-xs">
+                        {isFreeDelivery && deliveryZone === 'outside' ? 'FREE' : `৳${deliveryInfo.outsideDhakaCharge}`}
+                      </span>
+                    )}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setDeliveryZone('inside')}
+                    className={`flex flex-col items-center gap-1 py-3 px-4 rounded-xl border-2 transition-all ${
+                      deliveryZone === 'inside'
+                        ? 'border-[#167389] bg-[#167389]/10 text-[#167389]'
+                        : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300'
+                    }`}
+                  >
+                    <span className="text-lg">🏙️</span>
+                    <span className="text-sm font-semibold">Inside Dhaka</span>
+                    {deliveryInfo && (
+                      <span className="text-xs">
+                        {isFreeDelivery && deliveryZone === 'inside' ? 'FREE' : `৳${deliveryInfo.insideDhakaCharge}`}
+                      </span>
+                    )}
+                  </button>
+                </div>
+              </div>
+
               <CustomerInfoForm
                 onSubmit={handleSubmit}
                 isSubmitting={isSubmitting}
@@ -304,6 +348,7 @@ export default function CheckoutPage() {
                 isFreeDelivery={isFreeDelivery}
                 amountNeeded={amountNeeded}
                 total={total}
+                zone={deliveryZone}
               />
             </div>
           </motion.div>
@@ -361,6 +406,7 @@ export default function CheckoutPage() {
                 isFreeDelivery={isFreeDelivery}
                 amountNeeded={amountNeeded}
                 total={total}
+                zone={deliveryZone}
               />
             </div>
           </motion.div>

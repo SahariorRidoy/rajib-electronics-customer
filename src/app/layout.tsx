@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Rajib Electronics",
-  description: "Electornics Ecommerce",
+  description: "Electornics Gadgets and Gears Ecommerce Store in Bangladesh",
 };
 
 export default function RootLayout({

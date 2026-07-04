@@ -2,21 +2,16 @@
 
 import Link from "next/link";
 import { Building2, ChevronRight as ArrowRight } from "lucide-react";
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useGetManufacturersQuery } from "@/services/catalog.api";
 
 export default function MobileManufacturersGrid() {
-  const [isMounted, setIsMounted] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const { data, isLoading } = useGetManufacturersQuery();
   const manufacturers = data?.data || [];
 
   useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (!isMounted || !scrollRef.current || isLoading) return;
+    if (!scrollRef.current || isLoading) return;
     const scrollContainer = scrollRef.current;
     let scrollInterval: NodeJS.Timeout;
 
@@ -38,31 +33,7 @@ export default function MobileManufacturersGrid() {
     startAutoScroll();
 
     return () => clearInterval(scrollInterval);
-  }, [isMounted, isLoading, manufacturers.length]);
-
-  if (!isMounted) {
-    return (
-      <section className="block bg-white rounded-2xl border border-gray-200 shadow-sm p-4">
-        <div className="mb-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Building2 className="text-[#167389]" size={20} />
-            <h2 className="text-lg font-bold text-[#167389]">Manufacturers</h2>
-          </div>
-        </div>
-        <div className="grid grid-cols-3 gap-3">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <div
-              key={`sk-${i}`}
-              className="h-[156px] rounded-md border border-gray-200 bg-white p-3 flex flex-col items-center justify-start"
-            >
-              <div className="relative w-full h-[80%] rounded-md bg-gray-100 animate-pulse" />
-              <div className="mt-2 h-3 w-20 rounded bg-gray-100 animate-pulse" />
-            </div>
-          ))}
-        </div>
-      </section>
-    );
-  }
+  }, [isLoading, manufacturers.length]);
 
   const items = Array.isArray(manufacturers) ? manufacturers.slice(0, 12) : [];
 

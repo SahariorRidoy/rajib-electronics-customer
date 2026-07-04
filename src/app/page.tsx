@@ -9,12 +9,17 @@ import {
   useGetProductsQuery,
 } from "@/services/catalog.api";
 import ErrorBoundary from "@/components/home/ErrorBoundary";
-import { useState, useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import HeroBannerClient from "@/components/home/HeroBannerClient";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import TrendingGrid from "@/components/home/TrendingGrid";
 import ManufacturersSection from "@/components/home/ManufacturersSection";
-import NewArrivalsSection from "@/components/home/NewArrivalsSection";
+import dynamic from "next/dynamic";
+
+const NewArrivalsSection = dynamic(
+  () => import("@/components/home/NewArrivalsSection"),
+  { ssr: false }
+);
 
 import type { Product, Category } from "@/lib/schemas";
 import { ChevronRight } from "lucide-react";
@@ -42,12 +47,7 @@ function extractItems<T = any>(res: unknown): T[] {
 }
 
 export default function HomePage() {
-  const [isMounted, setIsMounted] = useState(false);
   const isMobile = useIsMobile();
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
 
   // APIs (RTK hooks)
   const { data: catRes, isLoading: catLoading } = useGetCategoriesQuery();
@@ -89,16 +89,6 @@ export default function HomePage() {
     () => filterInStock(editorsPicksAll).slice(0, 8),
     [editorsPicksAll, filterInStock],
   );
-
-  if (!isMounted) {
-    return (
-      <div className="min-h-screen bg-white">
-        <div className="max-w-[1600px] mx-auto lg:px-5 py-3">
-          <div className="h-64 bg-gray-200 animate-pulse rounded-lg"></div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-white">

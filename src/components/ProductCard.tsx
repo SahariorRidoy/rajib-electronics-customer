@@ -11,6 +11,7 @@ import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import type { AppProduct } from "@/types/product";
 import { useCartStore } from "@/store/cartStore";
+import { gtmAddToCart } from "@/lib/gtm";
 
 type Props = {
   product: AppProduct | any;
@@ -36,6 +37,7 @@ export default function ProductCard({
 }: Props) {
   const router = useRouter();
   const addItem = useCartStore((s) => s.addItem);
+  const setItem = useCartStore((s) => s.setItem);
   const cartItems = useCartStore((s) => s.items);
 
   const title = String(product?.title ?? product?.name ?? "Untitled");
@@ -144,6 +146,11 @@ export default function ProductCard({
 
       toast.success(`${quantity} × ${title} added to cart`);
 
+      gtmAddToCart(
+        { item_id: String(product._id), item_name: title, price },
+        quantity
+      );
+
       // Reset quantity after successful add
       setQuantity(1);
     } catch (e) {
@@ -159,11 +166,18 @@ export default function ProductCard({
       toast.error("Out of stock");
       return;
     }
-
     try {
       setBuying(true);
-      await handleAdd();
-      router.push("/checkout");
+      setItem({
+        _id: String(product._id),
+        title,
+        slug,
+        price,
+        image,
+        quantity,
+        color: "Default",
+      });
+      router.push("/cart");
     } catch (e) {
       console.error(e);
     } finally {
@@ -187,7 +201,7 @@ export default function ProductCard({
     >
       <Link
         href={`/products/${slug}`}
-        className="relative w-full bg-white overflow-hidden aspect-[4/3] block"
+        className="relative w-full bg-white overflow-hidden aspect-4/3 block"
         aria-label={`View ${title}`}
       >
         <CldImage
@@ -327,7 +341,7 @@ export default function ProductCard({
       isMobileScroll ? 'min-w-[48%] max-w-[48%] shrink-0' : 'w-full'
     }`}>
       <div className="w-full">
-        <div className="relative w-full aspect-[4/3] rounded-md overflow-hidden border bg-white">
+        <div className="relative w-full aspect-4/3 rounded-md overflow-hidden border bg-white">
           {showDiscount && discount > 0 && (
             <span className="absolute top-1 left-1 bg-pink-600 text-white px-2 py-0.5 rounded-full text-[10px] font-bold z-10">
               {discount}% OFF
@@ -406,7 +420,7 @@ export default function ProductCard({
         <button
           onClick={handleBuyNow}
           disabled={isOut || adding || buying}
-          className="flex-1 px-1 py-1.5 bg-gradient-to-r from-pink-600 to-rose-600 text-white rounded-md text-[10px] font-medium disabled:opacity-50 whitespace-nowrap"
+          className="flex-1 px-1 py-1.5 bg-linear-to-r from-pink-600 to-rose-600 text-white rounded-md text-[10px] font-medium disabled:opacity-50 whitespace-nowrap"
         >
           {buying ? "Processing..." : "Buy Now"}
         </button>

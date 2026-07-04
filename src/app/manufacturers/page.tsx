@@ -84,6 +84,7 @@ export default function ManufacturersPage() {
                     src={manufacturer.image}
                     alt={manufacturer.name}
                     className="max-w-full max-h-full object-contain"
+                    loading="lazy"
                   />
                 ) : (
                   <Sparkles className="w-12 h-12 text-cyan-600" />
