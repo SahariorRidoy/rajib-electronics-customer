@@ -33,8 +33,7 @@ export default function CheckoutPage() {
     [customerInfo.name, customerInfo.phone, customerInfo.address]
   );
 
-  const { phones } = usePublicSettings();
-  const hotline = phones[0] || process.env.NEXT_PUBLIC_HOTLINE || "09611677379";
+  const { hotline } = usePublicSettings();
 
   const [deliveryZone, setDeliveryZone] = useState<DeliveryZone>("outside");
   const [debouncedSubtotal, setDebouncedSubtotal] = useState(subtotal);

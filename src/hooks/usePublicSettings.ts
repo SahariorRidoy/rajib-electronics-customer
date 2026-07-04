@@ -23,6 +23,7 @@ interface ContactInfo {
 
 interface SiteSettings {
   siteName: string;
+  hotline: string;
   logos: Logo[];
   socialLinks: SocialLink[];
   contactInfo: ContactInfo;
@@ -34,12 +35,14 @@ let activeLogo: Logo | undefined = undefined;
 let socialLinks: SocialLink[] = [];
 let emails: string[] = [];
 let phones: string[] = [];
+let hotline: string = "";
 let siteName: string = process.env.NEXT_PUBLIC_BRAND || "Rajib Electronics";
 let fetchPromise: Promise<void> | null = null;
 
 function applyCache(data: SiteSettings) {
   cache = data;
   siteName = data.siteName ?? (process.env.NEXT_PUBLIC_BRAND || "Rajib Electronics");
+  hotline = data.hotline || "";
   activeLogo = data.logos.find((l) => l.isActive);
   socialLinks = data.socialLinks ?? [];
   emails = data.contactInfo?.emails ?? [];
@@ -67,5 +70,5 @@ export function usePublicSettings() {
       .catch(() => {});
   }, []);
 
-  return { siteName, activeLogo, socialLinks, emails, phones };
+  return { siteName, activeLogo, socialLinks, emails, phones, hotline };
 }

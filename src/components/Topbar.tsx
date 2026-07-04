@@ -86,13 +86,13 @@ function TopbarInner() {
     s.items.reduce((sum, item) => sum + item.quantity, 0)
   );
 
-  const { siteName: brand, activeLogo, socialLinks } = usePublicSettings();
+  const { siteName: brand, activeLogo, socialLinks, hotline } = usePublicSettings();
   const logoUrl = useMemo(() => activeLogo?.logoUrl || "/logo.png", [activeLogo]);
   const [logoSrc, setLogoSrc] = useState("/logo.png");
   useEffect(() => { setLogoSrc(logoUrl); }, [logoUrl]);
   const waLink = useMemo(() => socialLinks.find((l) => l.platform.toLowerCase() === "whatsapp"), [socialLinks]);
   const msLink = useMemo(() => socialLinks.find((l) => l.platform.toLowerCase() === "messenger"), [socialLinks]);
-  const hotline = process.env.NEXT_PUBLIC_HOTLINE || "+88017100000000";
+  const phoneLink = useMemo(() => socialLinks.find((l) => l.platform.toLowerCase() === "phone"), [socialLinks]);
   const API_BASE =
     process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_BASE;
 
@@ -529,6 +529,24 @@ function TopbarInner() {
                       <path d="M12 0C5.373 0 0 4.975 0 11.111c0 3.497 1.745 6.616 4.472 8.652V24l4.086-2.242c1.09.301 2.246.464 3.442.464 6.627 0 12-4.974 12-11.111C24 4.975 18.627 0 12 0zm1.191 14.963l-3.055-3.26-5.963 3.26L10.732 8l3.131 3.259L19.752 8l-6.561 6.963z"/>
                     </svg>
                     <span className="text-base font-semibold">Messenger</span>
+                  </a>
+                  )}
+                  {phoneLink && (
+                  <a
+                    href={`tel:${phoneLink.value}`}
+                    className="flex items-center justify-center gap-2 px-4 py-4 bg-[#167389] text-white rounded-lg hover:bg-[#125f73] transition shadow-sm"
+                  >
+                    <Phone className="w-6 h-6" />
+                    <span className="text-base font-semibold">{phoneLink.label || phoneLink.value}</span>
+                  </a>
+                  )}
+                  {hotline && (
+                  <a
+                    href={`tel:${hotline}`}
+                    className="flex items-center justify-center gap-2 px-4 py-4 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition shadow-sm"
+                  >
+                    <Phone className="w-6 h-6" />
+                    <span className="text-base font-semibold">Hotline: {hotline}</span>
                   </a>
                   )}
                 </div>
