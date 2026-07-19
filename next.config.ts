@@ -49,7 +49,7 @@ const nextConfig = {
       { protocol: "https", hostname: "rajib-electronics-backend.vercel.app" },
       { protocol: "https", hostname: "**.vercel.app" },
       { protocol: "https", hostname: "api.rajibelectronics.com" },
-      { protocol: "http", hostname: "localhost" },
+      { protocol: "http", hostname: "localhost", port: "5000" },
     ],
   },
 };

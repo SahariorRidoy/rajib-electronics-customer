@@ -8,6 +8,7 @@ import type { Product } from "@/types";
 import ProductDetailClient from "@/components/product/ProductDetailClient";
 import ProductCard from "@/components/ProductCard";
 import GtmViewItem from "@/components/product/GtmViewItem";
+import ReviewSection from "@/components/product/ReviewSection";
 
 export const revalidate = 0;
 export const dynamic = "force-dynamic";
@@ -145,6 +146,9 @@ export default async function ProductDetailsPage({
           safeDesc={safeDesc}
           looksHtml={looksHtml}
         />
+
+        {/* Reviews */}
+        <ReviewSection key={slug} productSlug={slug} />
 
         {/* Related Products */}
         {related.length > 0 && (
