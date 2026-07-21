@@ -108,7 +108,7 @@ export default memo(function CustomerInfoForm({
         </label>
         <input
           type="tel"
-          {...register("phone")}
+          {...register("phone", { setValueAs: (v: string) => v?.trim() })}
           placeholder="01XXXXXXXXX"
           className={errors.phone ? inputErr : inputOk}
           autoComplete="off"
