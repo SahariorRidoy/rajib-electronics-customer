@@ -30,6 +30,7 @@ interface CartStore {
   clearCart: () => void;
   getTotalPrice: () => number;
   getTotalItems: () => number;
+  syncCartPrices: () => Promise<void>;
 }
 
 const DUPLICATE_PROTECT_MS = 300; // ignore duplicate adds within 300ms per product
@@ -114,6 +115,30 @@ export const useCartStore = create<CartStore>()(
         },
 
         clearCart: () => set({ items: [] }),
+
+        syncCartPrices: async () => {
+          const { items } = get();
+          if (!items.length) return;
+          const API = process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://api.rajibelectronics.com/api/v1";
+          const updates = await Promise.allSettled(
+            items.map((item) =>
+              fetch(`${API}/products/id/${item._id}`, { cache: "no-store" })
+                .then((r) => r.json())
+                .then((json) => ({ _id: item._id, price: json?.data?.price as number }))
+            )
+          );
+          set((state) => ({
+            items: state.items.map((item) => {
+              const match = updates.find(
+                (u) => u.status === "fulfilled" && u.value._id === item._id
+              );
+              if (match && match.status === "fulfilled" && typeof match.value.price === "number") {
+                return { ...item, price: match.value.price };
+              }
+              return item;
+            }),
+          }));
+        },
 
         getTotalPrice: () => {
           const s = get();

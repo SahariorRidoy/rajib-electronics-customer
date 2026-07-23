@@ -22,6 +22,7 @@ export default function CheckoutPage() {
   const router = useRouter();
   const items = useCartStore((s) => s.items);
   const clearCart = useCartStore((s) => s.clearCart);
+  const syncCartPrices = useCartStore((s) => s.syncCartPrices);
   const subtotal = useCartStore((s) =>
     s.items.reduce((acc, it) => acc + Number(it.price || 0) * (it.quantity || 0), 0)
   );
@@ -52,7 +53,10 @@ export default function CheckoutPage() {
   const [mounted, setMounted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  useEffect(() => setMounted(true), []);
+  useEffect(() => {
+    setMounted(true);
+    syncCartPrices();
+  }, []);
 
   const beginCheckoutFired = useRef(false);
   useEffect(() => {

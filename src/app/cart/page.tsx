@@ -164,10 +164,13 @@ export default function CartPage() {
   const updateQuantity = useCartStore((s) => s.updateQuantity);
   const removeItem = useCartStore((s) => s.removeItem);
   const clearCart = useCartStore((s) => s.clearCart);
+  const syncCartPrices = useCartStore((s) => s.syncCartPrices);
 
   const totalNumber = useCartStore((s) =>
     s.items.reduce((acc, it) => acc + Number(it.price || 0) * (it.quantity || 0), 0)
   );
+
+  useEffect(() => { syncCartPrices(); }, []);
 
   const viewCartFired = useRef(false);
   useEffect(() => {
