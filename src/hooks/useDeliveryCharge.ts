@@ -9,6 +9,7 @@ interface DeliveryInfo {
   insideDhakaCharge: number;
   outsideDhakaCharge: number;
   zone: DeliveryZone;
+  deliveryChargePaymentRequired: boolean;
 }
 
 export function useDeliveryCharge(cartSubtotal: number, zone: DeliveryZone = 'outside') {
@@ -17,11 +18,6 @@ export function useDeliveryCharge(cartSubtotal: number, zone: DeliveryZone = 'ou
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (cartSubtotal <= 0) {
-      setDeliveryInfo(null);
-      return;
-    }
-
     const controller = new AbortController();
 
     const fetchDelivery = async () => {
@@ -32,7 +28,7 @@ export function useDeliveryCharge(cartSubtotal: number, zone: DeliveryZone = 'ou
         const res = await fetch(`${API}/delivery-charge`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ cartAmount: cartSubtotal, zone }),
+          body: JSON.stringify({ cartAmount: Math.max(0, cartSubtotal), zone }),
           signal: controller.signal,
         });
         if (!res.ok) throw new Error('Failed to fetch delivery charge');
@@ -49,6 +45,7 @@ export function useDeliveryCharge(cartSubtotal: number, zone: DeliveryZone = 'ou
           insideDhakaCharge: 80,
           outsideDhakaCharge: 120,
           zone,
+          deliveryChargePaymentRequired: false,
         });
       } finally {
         setLoading(false);

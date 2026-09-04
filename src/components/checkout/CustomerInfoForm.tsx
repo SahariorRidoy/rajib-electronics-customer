@@ -35,12 +35,14 @@ interface DeliveryInfo {
 
 interface Props {
   onSubmit: (data: CustomerFormData) => Promise<void>;
+  onPayOnline?: (data: CustomerFormData) => Promise<void>;
   isSubmitting: boolean;
   initialData?: Partial<CustomerFormData>;
   deliveryZone: DeliveryZone;
   setDeliveryZone: (zone: DeliveryZone) => void;
   deliveryInfo: DeliveryInfo | null;
   isFreeDelivery: boolean;
+  showPaymentOptions?: boolean;
 }
 
 const inputBase =
@@ -50,12 +52,14 @@ const inputErr = `${inputBase} border-red-300 focus:border-red-500 focus:ring-4 
 
 export default memo(function CustomerInfoForm({
   onSubmit,
+  onPayOnline,
   isSubmitting,
   initialData,
   deliveryZone,
   setDeliveryZone,
   deliveryInfo,
   isFreeDelivery,
+  showPaymentOptions = false,
 }: Props) {
   const {
     register,
@@ -179,29 +183,61 @@ export default memo(function CustomerInfoForm({
         </div>
       </div>
 
-      {/* Submit Button */}
-      <button
-        type="submit"
-        disabled={isSubmitting}
-        className={`w-full py-3.5 sm:py-4 rounded-2xl font-semibold text-white flex items-center justify-center gap-2 shadow-lg transition-colors active:scale-[0.97] active:shadow-md ${
-          isSubmitting
-            ? "bg-gray-400 cursor-not-allowed"
-            : "bg-[#167389] hover:bg-[#125f70] cursor-pointer"
-        }`}
-        style={{ transition: "background-color 0.15s, transform 0.1s, box-shadow 0.1s" }}
-      >
-        {isSubmitting ? (
-          <>
-            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-            Processing...
-          </>
-        ) : (
-          <>
-            <CheckCircle2 className="w-5 h-5" />
-            Place Order
-          </>
-        )}
-      </button>
+      {/* Submit Buttons */}
+      {showPaymentOptions ? (
+        <div className="flex flex-col gap-3">
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className={`w-full py-3.5 rounded-2xl font-semibold text-white flex items-center justify-center gap-2 shadow-lg transition-colors active:scale-[0.97] ${
+              isSubmitting ? "bg-gray-400 cursor-not-allowed" : "bg-[#167389] hover:bg-[#125f70] cursor-pointer"
+            }`}
+          >
+            {isSubmitting ? (
+              <><div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />Processing...</>
+            ) : (
+              <><CheckCircle2 className="w-5 h-5" />Cash on Delivery</>
+            )}
+          </button>
+          <button
+            type="button"
+            disabled={isSubmitting}
+            onClick={handleSubmit((data) => onPayOnline?.(data))}
+            className={`w-full py-3.5 rounded-2xl font-semibold text-white flex items-center justify-center gap-2 shadow-lg transition-colors active:scale-[0.97] ${
+              isSubmitting ? "bg-gray-400 cursor-not-allowed" : "bg-emerald-600 hover:bg-emerald-700 cursor-pointer"
+            }`}
+          >
+            {isSubmitting ? (
+              <><div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />Processing...</>
+            ) : (
+              <>💳 Pay Online (Advance)</>
+            )}
+          </button>
+        </div>
+      ) : (
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className={`w-full py-3.5 sm:py-4 rounded-2xl font-semibold text-white flex items-center justify-center gap-2 shadow-lg transition-colors active:scale-[0.97] active:shadow-md ${
+            isSubmitting
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-[#167389] hover:bg-[#125f70] cursor-pointer"
+          }`}
+          style={{ transition: "background-color 0.15s, transform 0.1s, box-shadow 0.1s" }}
+        >
+          {isSubmitting ? (
+            <>
+              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              Processing...
+            </>
+          ) : (
+            <>
+              <CheckCircle2 className="w-5 h-5" />
+              Place Order
+            </>
+          )}
+        </button>
+      )}
     </form>
   );
 })

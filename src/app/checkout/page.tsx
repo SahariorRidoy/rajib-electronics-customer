@@ -10,6 +10,7 @@ import { useCartStore } from "@/store/cartStore";
 import { createOrder } from "@/services/orders";
 import CustomerInfoForm from "@/components/checkout/CustomerInfoForm";
 import OrderSummaryCard from "@/components/checkout/OrderSummaryCard";
+import DeliveryChargeModal from "@/components/checkout/DeliveryChargeModal";
 import { useDeliveryCharge, type DeliveryZone } from "@/hooks/useDeliveryCharge";
 import { useCustomerInfo } from "@/hooks/useCustomerInfo";
 import { usePublicSettings } from "@/hooks/usePublicSettings";
@@ -52,6 +53,9 @@ export default function CheckoutPage() {
 
   const [mounted, setMounted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [isInitiatingPayment, setIsInitiatingPayment] = useState(false);
+  const [pendingCustomerData, setPendingCustomerData] = useState<any>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -69,11 +73,8 @@ export default function CheckoutPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleSubmit = useCallback(async (customerData: any) => {
-    if (!items.length) {
-      toast.error("Your cart is empty. Please add products first.");
-      return;
-    }
+  const placeOrder = useCallback(async (customerData: any) => {
+    if (!items.length) return;
 
     const customer: any = {
       name: customerData.name,
@@ -130,6 +131,121 @@ export default function CheckoutPage() {
       setIsSubmitting(false);
     }
   }, [items, subtotal, deliveryCharge, total, deliveryZone, isGuest, clearCart, router]);
+
+  const handlePayOnline = useCallback(async (customerData: any) => {
+    if (!items.length) return;
+    try {
+      setIsInitiatingPayment(true);
+
+      if (isGuest && customerData.phone) {
+        localStorage.setItem("customer_phone", customerData.phone);
+      }
+
+      const orderPayload = {
+        items: items.map((it) => ({
+          _id: String(it._id),
+          quantity: Math.max(1, toNum(it.quantity, 1)),
+          title: it.title,
+          price: it.price,
+          image: it.image ?? "",
+          color: it.color ?? "Default",
+        })),
+        customer: { name: customerData.name, phone: customerData.phone, address: customerData.address },
+        totals: { subTotal: subtotal, shipping: deliveryCharge, grandTotal: total },
+        deliveryZone,
+      };
+
+      const API = process.env.NEXT_PUBLIC_API_BASE_URL;
+      const payRes = await fetch(`${API}/payment/initiate`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          amount: total,
+          customerName: customerData.name,
+          customerPhone: customerData.phone,
+          customerAddress: customerData.address,
+          deliveryZone,
+          orderPayload,
+        }),
+      });
+
+      const payData = await payRes.json();
+      if (!payData.ok || !payData.paymentUrl) throw new Error(payData.message || "Payment initiation failed");
+
+      window.location.href = payData.paymentUrl;
+    } catch (err: any) {
+      console.error("Online payment error:", err);
+      toast.error(err?.message || "Payment initiation failed. Please try again.");
+      setIsInitiatingPayment(false);
+    }
+  }, [items, subtotal, deliveryCharge, total, deliveryZone, isGuest]);
+
+  const handleSubmit = useCallback(async (customerData: any) => {
+    if (!items.length) {
+      toast.error("Your cart is empty. Please add products first.");
+      return;
+    }
+
+    // If mandatory delivery charge payment is ON, show modal first
+    if (deliveryInfo?.deliveryChargePaymentRequired && deliveryCharge > 0) {
+      setPendingCustomerData(customerData);
+      setShowPaymentModal(true);
+      return;
+    }
+
+    await placeOrder(customerData);
+  }, [items, deliveryInfo, deliveryCharge, placeOrder]);
+
+  const handlePaymentConfirm = useCallback(async () => {
+    if (!pendingCustomerData || !items.length) return;
+
+    const customer = pendingCustomerData;
+
+    try {
+      setIsInitiatingPayment(true);
+
+      if (isGuest && customer.phone) {
+        localStorage.setItem("customer_phone", customer.phone);
+      }
+
+      const orderPayload = {
+        items: items.map((it) => ({
+          _id: String(it._id),
+          quantity: Math.max(1, toNum(it.quantity, 1)),
+          title: it.title,
+          price: it.price,
+          image: it.image ?? "",
+          color: it.color ?? "Default",
+        })),
+        customer: { name: customer.name, phone: customer.phone, address: customer.address },
+        totals: { subTotal: subtotal, shipping: deliveryCharge, grandTotal: total },
+        deliveryZone,
+      };
+
+      const API = process.env.NEXT_PUBLIC_API_BASE_URL;
+      const payRes = await fetch(`${API}/payment/initiate`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          amount: deliveryCharge,
+          customerName: customer.name,
+          customerPhone: customer.phone,
+          customerAddress: customer.address,
+          deliveryZone,
+          orderPayload,
+        }),
+      });
+
+      const payData = await payRes.json();
+      if (!payData.ok || !payData.paymentUrl) throw new Error(payData.message || "Payment initiation failed");
+
+      window.location.href = payData.paymentUrl;
+    } catch (err: any) {
+      console.error("Payment initiation error:", err);
+      toast.error(err?.message || "Payment initiation failed. Please try again.");
+      setIsInitiatingPayment(false);
+    }
+  }, [pendingCustomerData, items, subtotal, deliveryCharge, total, deliveryZone, isGuest]);
 
   if (!mounted) return (
     <div className="min-h-screen bg-gray-50 py-8 px-4">
@@ -237,12 +353,14 @@ export default function CheckoutPage() {
               )}
               <CustomerInfoForm
                 onSubmit={handleSubmit}
-                isSubmitting={isSubmitting}
+                onPayOnline={handlePayOnline}
+                isSubmitting={isSubmitting || isInitiatingPayment}
                 initialData={stableCustomerInfo}
                 deliveryZone={deliveryZone}
                 setDeliveryZone={setDeliveryZone}
                 deliveryInfo={deliveryInfo}
                 isFreeDelivery={isFreeDelivery}
+                showPaymentOptions={!deliveryInfo?.deliveryChargePaymentRequired}
               />
               <div className="text-center pt-6 border-t border-pink-100">
                 <p className="text-gray-600 mb-3 text-sm">Or</p>
@@ -273,6 +391,16 @@ export default function CheckoutPage() {
           </div>
         </div>
       </div>
+
+      {/* Delivery Charge Payment Modal */}
+      <DeliveryChargeModal
+        open={showPaymentModal}
+        deliveryCharge={deliveryCharge}
+        deliveryZone={deliveryZone}
+        isInitiating={isInitiatingPayment}
+        onConfirm={handlePaymentConfirm}
+        onCancel={() => { setShowPaymentModal(false); setPendingCustomerData(null); }}
+      />
     </div>
   );
 }
