@@ -196,7 +196,7 @@ export default memo(function CustomerInfoForm({
             {isSubmitting ? (
               <><div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />Processing...</>
             ) : (
-              <><CheckCircle2 className="w-5 h-5" />Cash on Delivery</>
+              <><CheckCircle2 className="w-5 h-5" />ক্যাশ অন ডেলিভারি</>
             )}
           </button>
           <button
@@ -210,7 +210,7 @@ export default memo(function CustomerInfoForm({
             {isSubmitting ? (
               <><div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />Processing...</>
             ) : (
-              <>💳 Pay Online (Advance)</>
+              <>💳 অনলাইনে পেমেন্ট করুন</>
             )}
           </button>
         </div>
@@ -233,7 +233,7 @@ export default memo(function CustomerInfoForm({
           ) : (
             <>
               <CheckCircle2 className="w-5 h-5" />
-              Place Order
+              অর্ডার করুন
             </>
           )}
         </button>

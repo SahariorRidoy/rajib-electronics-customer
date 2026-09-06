@@ -142,7 +142,7 @@ function SummaryPanel({
           style={{ transition: "background-color 0.15s, transform 0.1s" }}
           aria-label="Proceed to checkout"
         >
-          Proceed to Checkout
+          অর্ডার নিশ্চিত করুন
           <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
         </button>
       </Link>
@@ -395,7 +395,7 @@ export default function CartPage() {
               className="w-full bg-[#47c7ac] text-white py-3 rounded-xl font-semibold flex items-center justify-center gap-2 shadow-md hover:opacity-95 transition"
               aria-label="Place order and go to checkout"
             >
-              Checkout
+              অর্ডার নিশ্চিত করুন
             </button>
           </Link>
         </div>
