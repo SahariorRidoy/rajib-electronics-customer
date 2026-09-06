@@ -28,18 +28,16 @@ function PaymentSuccessContent() {
         setVerified(isSuccess);
         if (isSuccess) {
           clearCart();
-          localStorage.removeItem("pending_payment_orderId");
         }
       } catch {
         setVerified(true);
         clearCart();
-        localStorage.removeItem("pending_payment_orderId");
       } finally {
         setVerifying(false);
       }
     };
     verify();
-  }, [invoice]);
+  }, [invoice, clearCart]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 flex items-center justify-center p-4">

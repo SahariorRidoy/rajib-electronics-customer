@@ -137,9 +137,8 @@ export default function CheckoutPage() {
     try {
       setIsInitiatingPayment(true);
 
-      if (isGuest && customerData.phone) {
-        localStorage.setItem("customer_phone", customerData.phone);
-      }
+      // Save phone before redirect so orders page can find orders after payment
+      localStorage.setItem("customer_phone", customerData.phone);
 
       const orderPayload = {
         items: items.map((it) => ({
@@ -204,9 +203,8 @@ export default function CheckoutPage() {
     try {
       setIsInitiatingPayment(true);
 
-      if (isGuest && customer.phone) {
-        localStorage.setItem("customer_phone", customer.phone);
-      }
+      // Save phone before redirect so orders page can find orders after payment
+      localStorage.setItem("customer_phone", customer.phone);
 
       const orderPayload = {
         items: items.map((it) => ({
