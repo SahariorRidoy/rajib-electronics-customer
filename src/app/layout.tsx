@@ -6,6 +6,7 @@ import Script from "next/script";
 import ToastProvider from "@/components/ToastProvider";
 import ReduxProvider from "../store/ReduxProvider";
 import ClientLayout from "@/components/ClientLayout";
+import TiktokPixel from "@/components/TiktokPixel";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -51,6 +52,7 @@ export default function RootLayout({
         </noscript>
         <ReduxProvider>
           <ToastProvider />
+          <TiktokPixel />
           <ClientLayout>{children}</ClientLayout>
         </ReduxProvider>
       </body>

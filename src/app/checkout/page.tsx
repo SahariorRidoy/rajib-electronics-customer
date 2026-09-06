@@ -15,6 +15,7 @@ import { useDeliveryCharge, type DeliveryZone } from "@/hooks/useDeliveryCharge"
 import { useCustomerInfo } from "@/hooks/useCustomerInfo";
 import { usePublicSettings } from "@/hooks/usePublicSettings";
 import { gtmBeginCheckout, gtmPurchase } from "@/lib/gtm";
+import { ttqInitiateCheckout, ttqCompletePayment } from "@/lib/ttq";
 
 const toNum = (v: unknown, f = 0) =>
   Number.isFinite(Number(v)) ? Number(v) : f;
@@ -70,6 +71,7 @@ export default function CheckoutPage() {
       items.map((i) => ({ item_id: i._id, item_name: i.title, price: i.price, quantity: i.quantity })),
       subtotal
     );
+    ttqInitiateCheckout(subtotal);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -114,6 +116,7 @@ export default function CheckoutPage() {
           shipping: deliveryCharge,
           items: items.map((i) => ({ item_id: i._id, item_name: i.title, price: i.price, quantity: i.quantity })),
         });
+        ttqCompletePayment({ transaction_id: result.data?.orderId ?? Date.now().toString(), value: total });
         if (isGuest && customerData.phone) {
           localStorage.setItem("customer_phone", customerData.phone);
         }

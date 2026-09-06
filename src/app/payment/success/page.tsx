@@ -4,6 +4,7 @@ import { useEffect, useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { CheckCircle, ArrowRight, Package } from "lucide-react";
 import { useCartStore } from "@/store/cartStore";
+import { ttqCompletePayment } from "@/lib/ttq";
 
 function PaymentSuccessContent() {
   const searchParams = useSearchParams();
@@ -28,6 +29,7 @@ function PaymentSuccessContent() {
         setVerified(isSuccess);
         if (isSuccess) {
           clearCart();
+          ttqCompletePayment({ transaction_id: trxId || invoice, value: Number(amount) || 0 });
         }
       } catch {
         setVerified(true);

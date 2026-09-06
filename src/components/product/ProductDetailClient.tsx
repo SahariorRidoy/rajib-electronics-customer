@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "@/lib/image";
 import Link from "next/link";
 import { Phone, Sparkles } from "lucide-react";
 import type { Product, ColorVariant } from "@/types";
 import ProductActions from "./ProductActions";
+import { ttqViewContent } from "@/lib/ttq";
 
 interface Props {
   product: Product;
@@ -27,6 +28,10 @@ export default function ProductDetailClient({
   looksHtml,
 }: Props) {
   const colorVariants: ColorVariant[] = product.colorVariants ?? [];
+
+  useEffect(() => {
+    ttqViewContent({ content_id: product._id, content_name: product.title, value: product.price });
+  }, []);
 
   // gallery images first, then color variant images
   const thumbImages = [

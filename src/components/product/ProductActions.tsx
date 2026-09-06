@@ -7,6 +7,7 @@ import { useCartStore } from "@/store/cartStore";
 import type { Product, ColorVariant } from "@/types";
 import { toast } from "react-hot-toast";
 import { gtmAddToCart } from "@/lib/gtm";
+import { ttqAddToCart } from "@/lib/ttq";
 import { ShoppingBag } from "lucide-react";
 
 interface ProductActionsProps {
@@ -86,6 +87,7 @@ export default function ProductActions({
         { item_id: product._id, item_name: product.title, price: product.price },
         quantity
       );
+      ttqAddToCart({ content_id: product._id, content_name: product.title, value: product.price, quantity });
 
       toast.custom(
         (t) => (
